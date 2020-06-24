@@ -1,0 +1,15 @@
+.changed {
+    border-color: #ffff00;
+}
+
+table, tr {
+    border: thin #000000 solid;
+}
+
+td {
+    border: thin transparent solid;
+}
+
+table:hover, tr:hover {
+    border: thin #0000cc solid;
+}
