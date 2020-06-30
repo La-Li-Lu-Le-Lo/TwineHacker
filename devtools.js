@@ -1,4 +1,6 @@
 const TwineHacker = {
+    interval: 500,
+    automatic: true,
     detect: {
         "SugarCube1": "SugarCube.state.active.variables",
         "SugarCube2": "SugarCube.State.active.variables",
@@ -27,26 +29,40 @@ const TwineHacker = {
         }
     },
     inspected: vars => {
+        const automatic = TwineHacker.win.document.getElementById("automatic");
+        const interval = TwineHacker.win.document.getElementById("interval");
+        automatic.checked = TwineHacker.automatic;
+        automatic.addEventListener("click", () => {
+            TwineHacker.automatic = automatic.checked;
+        });
+        interval.value = TwineHacker.interval;
+        interval.addEventListener("change", () => {
+            TwineHacker.interval = interval.value;
+        });
+
         const content = TwineHacker.win.document.getElementById("content");
         content.innerHTML = "";
         TwineHacker.createNodeForAny(vars, TwineHacker.expr, content);
         TwineHacker.schedule();
     },
-    renew: () => {
-        for (const path in TwineHacker.data) {
-            const item = TwineHacker.data[path];
-            TwineHacker.eval(path, newValue => {
-                if (item.value !== newValue) {
-                    item.value = newValue;
-                    item.editor.value = newValue;
-                    TwineHacker.stylize(path, true);
-                }
-            }, ex => TwineHacker.error(`Cannot evaluate ${path}: ${ex.description}`));
-        }
-        TwineHacker.schedule();
+    renewAll: () => {
+        for (const path in TwineHacker.data)
+            TwineHacker.renewSingle(path);
+        if (TwineHacker.automatic)
+            TwineHacker.schedule();
+    },
+    renewSingle: path => {
+        const item = TwineHacker.data[path];
+        TwineHacker.eval(path, newValue => {
+            if (item.value !== newValue) {
+                item.value = newValue;
+                item.editor.value = newValue;
+                TwineHacker.stylize(path, true);
+            }
+        }, ex => TwineHacker.error(`Cannot evaluate ${path}: ${ex.description}`));
     },
     schedule: () =>
-        setTimeout(TwineHacker.renew, 500),
+        setTimeout(TwineHacker.renewAll, TwineHacker.interval),
     createTableForObject: (object, path, parent) => {
         const table = TwineHacker.element("table", {"class": "object"}, parent);
         for (const objectName in object) {
@@ -72,12 +88,7 @@ const TwineHacker = {
             parent.setAttribute("class", `${parent.getAttribute("class")} single`);
             const span = TwineHacker.element("span", {
                 "class": "single-span",
-                "title": path
-                    .split(".")
-                    .slice(4)
-                    .map(x => x.charAt(0).toUpperCase() + x.substring(1).split(/(?=[A-Z])/).join(" "))
-                    .join(": ")
-                    .split("_").join(" ")
+                "title": TwineHacker.toTitle(path)
             }, parent);
             const editor = TwineHacker.element("input", {
                 "type": type === "number" ? "number" : "text",
@@ -93,10 +104,24 @@ const TwineHacker = {
                 "value": object
             };
             editor.addEventListener("change", e => TwineHacker.onEdit(e.target.dataset.path, e.target.value));
-            editor.addEventListener("focus", e => TwineHacker.stylize(e.target.dataset.path, false));
+            editor.addEventListener("focus", e => {
+                TwineHacker.renewSingle(e.target.dataset.path);
+                TwineHacker.stylize(e.target.dataset.path, false);
+            });
             editor.addEventListener("blur", e => TwineHacker.onEdit(e.target.dataset.path, e.target.value));
             return span;
         }
+    },
+    toTitle: path =>{
+        const items = [];
+        let found;
+        while(found = /\['(.*?)']/g.exec(path)) {
+            items.push(found[1]);
+        }
+        return items
+            .map(x => x.charAt(0).toUpperCase() + x.substring(1).split(/(?=[A-Z])/).join(" "))
+            .join(": ")
+            .split("_").join(" ");
     },
     onEdit: (path, value) => {
         if (TwineHacker.data[path].value !== value) {

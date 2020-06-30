@@ -17,3 +17,6 @@ Had to completely rewrite extension, basing on original logic with slight modifi
  (I hate this bug with not fully expandable panels and no possibility even to scroll)
 - No keys to activate. If TwH has detected the game, it will show panel, otherwise empty.
 - It's easy to add support to other engines (Wikifier etc)
+
+## TODO
+- support more games and game engines

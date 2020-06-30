@@ -1,3 +1,7 @@
+#interval {
+    width: 8ex;
+}
+
 .changed {
     border-color: #ffff00;
 }
