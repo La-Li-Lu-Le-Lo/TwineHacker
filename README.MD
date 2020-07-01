@@ -23,3 +23,4 @@ Had to completely rewrite extension, basing on original logic with slight modifi
 
 ## Latest changes
 - 01.07.2012 14:00 - hanging issues fixed
+- 01.07.2012 23:00 - separate options page

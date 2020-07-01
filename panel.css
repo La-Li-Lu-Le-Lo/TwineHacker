@@ -2,18 +2,30 @@
     width: 8ex;
 }
 
-.changed {
+#content .label, #content input {
+    width: 20ex;
+}
+
+#content .label {
+    text-align: right;
+}
+
+#content input {
+    text-align: left;
+}
+
+#content .changed {
     border-color: #ffff00;
 }
 
-table, tr {
+#content table, #content tr {
     border: thin #000000 solid;
 }
 
-td {
+#content td {
     border: thin transparent solid;
 }
 
-table:hover, tr:hover {
+#content table:hover, #content tr:hover {
     border: thin #0000cc solid;
 }

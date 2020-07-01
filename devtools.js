@@ -7,8 +7,8 @@ const TwineHacker = {
         "wetgame": "wetgame.state.story.variablesState._globalVariables"
     },
     Options: {
-        interval: 0,
-        automatic: false,
+        interval: 500,
+        automatic: true,
         construct: (automatic, interval) => {
             TwineHacker.Options.automatic = automatic;
             TwineHacker.Options.interval = interval;
@@ -16,14 +16,52 @@ const TwineHacker = {
             elementAutomatic.checked = TwineHacker.Options.automatic;
             elementAutomatic.addEventListener("click", () => {
                 TwineHacker.Options.automatic = elementAutomatic.checked;
+                TwineHacker.Options.save();
                 if (TwineHacker.Options.automatic) TwineHacker.scheduleUpdate();
             });
             const elementInterval = TwineHacker.DOM.getElement("interval");
             elementInterval.value = TwineHacker.Options.interval;
             elementInterval.addEventListener("change", () => {
                 TwineHacker.Options.interval = elementInterval.value;
+                TwineHacker.Options.save();
+            });
+            TwineHacker.Options.load(options => {
+                if (options.automatic) TwineHacker.Options.automatic = options.automatic;
+                elementAutomatic.checked = TwineHacker.Options.automatic;
+                if (options.interval) TwineHacker.Options.interval = options.interval;
+                elementInterval.value = TwineHacker.Options.interval;
+                if (options.automatic) TwineHacker.scheduleUpdate();
             });
         },
+        save: () => {
+            const storageOptions = {
+                automatic: TwineHacker.Options.automatic,
+                interval: TwineHacker.Options.interval,
+            };
+            if (typeof chrome === "undefined") {
+                // noinspection JSUnresolvedVariable,ES6ModulesDependencies
+                browser.storage.sync.set(storageOptions)
+                    .then(value => {
+                    })
+                    .catch(reason => {
+                    });
+            } else
+                chrome.storage.sync.set(storageOptions, () => {
+                });
+        },
+        load: onOptions => {
+            const storageOptions = {
+                automatic: TwineHacker.Options.automatic,
+                interval: TwineHacker.Options.interval,
+            };
+            if (typeof chrome === "undefined") {
+                // noinspection JSUnresolvedVariable,ES6ModulesDependencies
+                browser.storage.sync.get()
+                    .then(value => onOptions(value))
+                    .catch(reason => TwineHacker.Util.showError(reason));
+            } else
+                chrome.storage.sync.get(value => onOptions(value));
+        }
     },
     rootExpression: null,
     data: {},
@@ -64,14 +102,17 @@ const TwineHacker = {
         }
         return cur;
     },
-    updateAllFields: () =>
-        TwineHacker.Util.eval(TwineHacker.rootExpression, vars => {
-            TwineHacker.Util.forEach(TwineHacker.data, path =>
-                TwineHacker.updateFieldValue(path, TwineHacker.getInPath(vars, path.substring(1).split('.'))));
-            if (TwineHacker.Options.automatic)
-                TwineHacker.scheduleUpdate();
-        }, ex =>
-            TwineHacker.Util.showError(`Cannot evaluate expr ${TwineHacker.rootExpression}: ${ex.description}`, ex)),
+    updateAllFields: () => {
+        if (TwineHacker.DOM.window)
+            TwineHacker.Util.eval(TwineHacker.rootExpression, vars => {
+                TwineHacker.Util.forEach(TwineHacker.data, path =>
+                    TwineHacker.updateFieldValue(path, TwineHacker.getInPath(vars, path.substring(1).split('.'))));
+                if (TwineHacker.Options.automatic)
+                    TwineHacker.scheduleUpdate();
+            }, ex =>
+                TwineHacker.Util.showError(`Cannot evaluate expr ${TwineHacker.rootExpression}: ${ex.description}`,
+                    ex));
+    },
     updateField: path => {
         let expression = `${TwineHacker.rootExpression}`;
         const array = path.substring(1).split('.');
@@ -235,8 +276,7 @@ const TwineHacker = {
         }
     }
 };
-
-TwineHacker.construct();
+window.document.addEventListener('DOMContentLoaded', () => TwineHacker.construct());
 
 
 
