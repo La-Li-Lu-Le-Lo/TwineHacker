@@ -23,6 +23,7 @@ const TwineHacker = {
         automatic.checked = TwineHacker.automatic;
         automatic.addEventListener("click", () => {
             TwineHacker.automatic = automatic.checked;
+            if(TwineHacker.automatic) TwineHacker.schedule();
         });
         interval.value = TwineHacker.interval;
         interval.addEventListener("change", () => {
@@ -46,20 +47,27 @@ const TwineHacker = {
         TwineHacker.schedule();
     },
     renewAll: () => {
-        for (const path in TwineHacker.data)
-            TwineHacker.renewSingle(path);
-        if (TwineHacker.automatic)
-            TwineHacker.schedule();
+        TwineHacker.eval(TwineHacker.expr, vars => {
+                for (const path in TwineHacker.data) {
+                    var newValue = eval(`${TwineHacker.expr}${path}`);
+                    TwineHacker.renewSingleAfter(path, newValue);
+                }
+                if (TwineHacker.automatic)
+                    TwineHacker.schedule();
+            },
+            ex => TwineHacker.error(`Cannot evaluate expr ${TwineHacker.expr}: ${ex.description}`, ex));
     },
     renewSingle: path => {
+        TwineHacker.eval(`${TwineHacker.expr}${path}`, newValue => TwineHacker.renewSingleAfter(path, newValue),
+            ex => TwineHacker.error(`Cannot evaluate ${path}: ${ex.description}`, ex));
+    },
+    renewSingleAfter: (path, newValue) => {
         const item = TwineHacker.data[path];
-        TwineHacker.eval(`${TwineHacker.expr}${path}`, newValue => {
-            if (item.value !== newValue) {
-                item.value = newValue;
-                item.editor.value = newValue;
-                TwineHacker.stylize(path, true);
-            }
-        }, ex => TwineHacker.error(`Cannot evaluate ${path}: ${ex.description}`, ex));
+        if (item.value !== newValue) {
+            item.value = newValue;
+            item.editor.value = newValue;
+            TwineHacker.stylize(path, true);
+        }
     },
     schedule: () =>
         setTimeout(TwineHacker.renewAll, TwineHacker.interval),
