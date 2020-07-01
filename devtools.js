@@ -9,7 +9,7 @@ const TwineHacker = {
     expr: null,
     win: null,
     data: {},
-    error: msg => alert(`Error: ${msg}`),
+    error: (msg, ex) => alert(`Error: ${msg} ${ex ? JSON.stringify(ex) : ''}`),
     destroy: () => {
         TwineHacker.win.document.getElementById("content").innerHTML = "";
         TwineHacker.data = {};
@@ -18,17 +18,6 @@ const TwineHacker = {
     },
     init: win => {
         TwineHacker.win = win;
-        for (const key in TwineHacker.detect) {
-            const expression = TwineHacker.detect[key];
-            TwineHacker.eval(expression, vars => {
-                if (vars) {
-                    TwineHacker.expr = expression;
-                    TwineHacker.inspected(vars);
-                }
-            });
-        }
-    },
-    inspected: vars => {
         const automatic = TwineHacker.win.document.getElementById("automatic");
         const interval = TwineHacker.win.document.getElementById("interval");
         automatic.checked = TwineHacker.automatic;
@@ -39,10 +28,21 @@ const TwineHacker = {
         interval.addEventListener("change", () => {
             TwineHacker.interval = interval.value;
         });
-
         const content = TwineHacker.win.document.getElementById("content");
         content.innerHTML = "";
-        TwineHacker.createNodeForAny(vars, TwineHacker.expr, content);
+        for (const key in TwineHacker.detect) {
+            const expression = TwineHacker.detect[key];
+            TwineHacker.eval(expression, vars => {
+                if (vars && !TwineHacker.expr) {
+                    TwineHacker.expr = expression;
+                    TwineHacker.inspected(vars);
+                }
+            });
+        }
+    },
+    inspected: vars => {
+        const content = TwineHacker.win.document.getElementById("content");
+        TwineHacker.createNodeForAny(vars, "", content);
         TwineHacker.schedule();
     },
     renewAll: () => {
@@ -53,13 +53,13 @@ const TwineHacker = {
     },
     renewSingle: path => {
         const item = TwineHacker.data[path];
-        TwineHacker.eval(path, newValue => {
+        TwineHacker.eval(`${TwineHacker.expr}${path}`, newValue => {
             if (item.value !== newValue) {
                 item.value = newValue;
                 item.editor.value = newValue;
                 TwineHacker.stylize(path, true);
             }
-        }, ex => TwineHacker.error(`Cannot evaluate ${path}: ${ex.description}`));
+        }, ex => TwineHacker.error(`Cannot evaluate ${path}: ${ex.description}`, ex));
     },
     schedule: () =>
         setTimeout(TwineHacker.renewAll, TwineHacker.interval),
@@ -69,9 +69,9 @@ const TwineHacker = {
             if (object.hasOwnProperty(objectName)) {
                 const tr = TwineHacker.element("tr", {"class": "row"}, table);
                 TwineHacker.text(objectName
-                        .split("_")
-                        .map(x => x.charAt(0).toUpperCase() + x.substring(1).split(/(?=[A-Z])/).join(" "))
-                        .join(" "),
+                    /*.split("_")
+                    .map(x => x.charAt(0).toUpperCase() + x.substring(1).split(/(?=[A-Z])/).join(" "))
+                    .join(" ")*/,
                     TwineHacker.element("th", {"class": "label"}, tr));
                 TwineHacker.createNodeForAny(object[objectName], `${path}['${objectName}']`,
                     TwineHacker.element("td", {"class": "cell"}, tr));
@@ -87,15 +87,15 @@ const TwineHacker = {
         } else {
             parent.setAttribute("class", `${parent.getAttribute("class")} single`);
             const span = TwineHacker.element("span", {
-                "class": "single-span",
-                "title": TwineHacker.toTitle(path)
+                "class": "single-span"/*,
+                "title": TwineHacker.toTitle(path)*/
             }, parent);
             const editor = TwineHacker.element("input", {
                 "type": type === "number" ? "number" : "text",
                 "value": object,
-                "class": `editor ${path}`,
-                "data-path": path,
-                "data-type": type
+                /*"class": `editor ${path}`,*/
+                // "data-path": path,
+                // "data-type": type
             }, span);
             TwineHacker.data[path] = {
                 path,
@@ -103,19 +103,19 @@ const TwineHacker = {
                 editor,
                 "value": object
             };
-            editor.addEventListener("change", e => TwineHacker.onEdit(e.target.dataset.path, e.target.value));
+            editor.addEventListener("change", e => TwineHacker.onEdit(path, e.target.value));
             editor.addEventListener("focus", e => {
-                TwineHacker.renewSingle(e.target.dataset.path);
-                TwineHacker.stylize(e.target.dataset.path, false);
+                TwineHacker.renewSingle(path);
+                TwineHacker.stylize(path, false);
             });
-            editor.addEventListener("blur", e => TwineHacker.onEdit(e.target.dataset.path, e.target.value));
+            editor.addEventListener("blur", e => TwineHacker.onEdit(path, e.target.value));
             return span;
         }
     },
-    toTitle: path =>{
+    toTitle: path => {
         const items = [];
         let found;
-        while(found = /\['(.*?)']/g.exec(path)) {
+        while (found = /\['(.*?)']/g.exec(path)) {
             items.push(found[1]);
         }
         return items
@@ -126,23 +126,23 @@ const TwineHacker = {
     onEdit: (path, value) => {
         if (TwineHacker.data[path].value !== value) {
             TwineHacker.stylize(path, false);
-            let expression = `${path}='${value}';`;
+            let expression = `${TwineHacker.expr}${path}='${value}';`;
             switch (TwineHacker.data[path].type) {
                 case "number":
-                    expression = `${path}=parseFloat(${value});`;
+                    expression = `${TwineHacker.expr}${path}=parseFloat(${value});`;
                     break;
                 case "string":
-                    expression = `${path}='${(value.replace("'", "\\'"))}';`;
+                    expression = `${TwineHacker.expr}${path}='${(value.replace("'", "\\'"))}';`;
                     break;
                 case "boolean":
-                    expression = `${path}='${(value.toLowerCase() === "true")}';`;
+                    expression = `${TwineHacker.expr}${path}='${(value.toLowerCase() === "true")}';`;
                     break;
                 default:
                     break;
             }
             TwineHacker.eval(expression, () => {
                 TwineHacker.data[path].value = value;
-            }, ex => TwineHacker.error(`Cannot set value for ${path}: ${ex.description}`));
+            }, ex => TwineHacker.error(`Cannot set value for ${path}: ${ex.description}`, ex));
         }
     },
     stylize: (path, changed) =>
