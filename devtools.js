@@ -7,19 +7,21 @@ const TwineHacker = {
         "wetgame": "wetgame.state.story.variablesState._globalVariables"
     },
     Options: {
-        interval: 500,
-        automatic: true,
-        construct: () => {
-            const automatic = TwineHacker.DOM.getElement("automatic");
-            const interval = TwineHacker.DOM.getElement("interval");
-            automatic.checked = TwineHacker.Options.automatic;
-            automatic.addEventListener("click", () => {
-                TwineHacker.Options.automatic = automatic.checked;
+        interval: 0,
+        automatic: false,
+        construct: (automatic, interval) => {
+            TwineHacker.Options.automatic = automatic;
+            TwineHacker.Options.interval = interval;
+            const elementAutomatic = TwineHacker.DOM.getElement("automatic");
+            elementAutomatic.checked = TwineHacker.Options.automatic;
+            elementAutomatic.addEventListener("click", () => {
+                TwineHacker.Options.automatic = elementAutomatic.checked;
                 if (TwineHacker.Options.automatic) TwineHacker.scheduleUpdate();
             });
-            interval.value = TwineHacker.Options.interval;
-            interval.addEventListener("change", () => {
-                TwineHacker.Options.interval = interval.value;
+            const elementInterval = TwineHacker.DOM.getElement("interval");
+            elementInterval.value = TwineHacker.Options.interval;
+            elementInterval.addEventListener("change", () => {
+                TwineHacker.Options.interval = elementInterval.value;
             });
         },
     },
@@ -30,13 +32,13 @@ const TwineHacker = {
             TwineHacker.init, TwineHacker.destroy),
     destroy: () => {
         TwineHacker.DOM.clearElement("content");
-        TwineHacker.data = {};
         TwineHacker.rootExpression = null;
+        TwineHacker.data = {};
         TwineHacker.DOM.window = null;
     },
-    init: win => {
-        TwineHacker.DOM.window = win;
-        TwineHacker.Options.construct();
+    init: window => {
+        TwineHacker.DOM.construct(window);
+        TwineHacker.Options.construct(true, 500);
         TwineHacker.DOM.clearElement("content");
         TwineHacker.Util.forEach(TwineHacker.engines, (key, expression) =>
             TwineHacker.Util.eval(expression, vars => {
@@ -47,6 +49,7 @@ const TwineHacker = {
     },
     inspected: (expression, vars) => {
         TwineHacker.rootExpression = expression;
+        TwineHacker.data = {};
         TwineHacker.createData(vars, "", TwineHacker.data);
         TwineHacker.createUi(vars, "", TwineHacker.DOM.getElement("content"));
         TwineHacker.scheduleUpdate();
@@ -63,9 +66,8 @@ const TwineHacker = {
     },
     updateAllFields: () =>
         TwineHacker.Util.eval(TwineHacker.rootExpression, vars => {
-            TwineHacker.Util.forEach(TwineHacker.data, (path, element) => {
-                TwineHacker.updateFieldValue(path, TwineHacker.getInPath(vars, path.substring(1).split('.')));
-            });
+            TwineHacker.Util.forEach(TwineHacker.data, path =>
+                TwineHacker.updateFieldValue(path, TwineHacker.getInPath(vars, path.substring(1).split('.'))));
             if (TwineHacker.Options.automatic)
                 TwineHacker.scheduleUpdate();
         }, ex =>
@@ -170,11 +172,12 @@ const TwineHacker = {
     },
     DOM: {
         window: null,
+        construct: window => {
+            TwineHacker.DOM.window = window;
+        },
         createElement: (name, attrs, parent) => {
             const element = TwineHacker.DOM.window.document.createElement(name);
-            TwineHacker.Util.forEach(attrs,(key,attrValue)=>{
-                element.setAttribute(key, attrValue);
-            });
+            TwineHacker.Util.forEach(attrs, (key, attrValue) => element.setAttribute(key, attrValue));
             if (parent) parent.appendChild(element);
             return element;
         },
