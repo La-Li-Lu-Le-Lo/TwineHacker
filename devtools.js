@@ -49,8 +49,18 @@ const TwineHacker = {
     renewAll: () => {
         TwineHacker.eval(TwineHacker.expr, vars => {
                 for (const path in TwineHacker.data) {
-                    var newValue = eval(`${TwineHacker.expr}${path}`);
-                    TwineHacker.renewSingleAfter(path, newValue);
+                    const exp=`'a'`;
+                    try {
+                        var newValue = eval(exp);
+                    } catch (e) {
+                        TwineHacker.error(`error evaluating test ${exp}`);
+                    }
+                    try {
+                        var newValue = eval(`vars${path}`);
+                        TwineHacker.renewSingleAfter(path, newValue);
+                    } catch (e) {
+                        TwineHacker.error(`error evaluating single vars${path}`);
+                    }
                 }
                 if (TwineHacker.automatic)
                     TwineHacker.schedule();
@@ -64,6 +74,7 @@ const TwineHacker = {
     renewSingleAfter: (path, newValue) => {
         const item = TwineHacker.data[path];
         if (item.value !== newValue) {
+            alert(`renewSingleAfter ${path}: (${item.editor.value}) ${item.value}[${typeof item.value}] -> ${newValue}[${typeof newValue}]`);
             item.value = newValue;
             item.editor.value = newValue;
             TwineHacker.stylize(path, true);
