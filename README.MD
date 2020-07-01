@@ -22,4 +22,4 @@ Had to completely rewrite extension, basing on original logic with slight modifi
 - support more games and game engines
 
 ## Latest changes
-- 01.07.2012 12:00 - quick patch with hanging
+- 01.07.2012 14:00 - hanging issues fixed

@@ -90,15 +90,16 @@ const TwineHacker = {
     },
     schedule: () =>
         setTimeout(TwineHacker.renewAll, TwineHacker.interval),
+    toLabel: key =>
+        key.split("_")
+            .map(x => x.charAt(0).toUpperCase() + x.substring(1).split(/(?=[A-Z])/).join(" "))
+            .join(" "),
     createTableForObject: (object, path, parent) => {
         const table = TwineHacker.element("table", {"class": "object"}, parent);
         for (const objectName in object) {
             if (object.hasOwnProperty(objectName)) {
                 const tr = TwineHacker.element("tr", {"class": "row"}, table);
-                TwineHacker.text(objectName
-                    /*.split("_")
-                    .map(x => x.charAt(0).toUpperCase() + x.substring(1).split(/(?=[A-Z])/).join(" "))
-                    .join(" ")*/,
+                TwineHacker.text(TwineHacker.toLabel(objectName),
                     TwineHacker.element("th", {"class": "label"}, tr));
                 TwineHacker.createNodeForAny(object[objectName], `${path}.${objectName}`,
                     TwineHacker.element("td", {"class": "cell"}, tr));
@@ -114,8 +115,8 @@ const TwineHacker = {
         } else {
             parent.setAttribute("class", `${parent.getAttribute("class")} single`);
             const span = TwineHacker.element("span", {
-                "class": "single-span"/*,
-                "title": TwineHacker.toTitle(path)*/
+                "class": "single-span",
+                "title": TwineHacker.toTitle(path)
             }, parent);
             const editor = TwineHacker.element("input", {
                 "type": type === "number" ? "number" : "text",
@@ -141,9 +142,9 @@ const TwineHacker = {
     },
     toTitle: path =>
         path.substring(1).split('.')
-            .map(x => x.charAt(0).toUpperCase() + x.substring(1).split(/(?=[A-Z])/).join(" "))
+            .map(x => x.charAt(0).toUpperCase() + x.substring(1).split(/(?=[A-Z])/).join(" ").split("_").join(" "))
             .join(": ")
-            .split("_").join(" "),
+            ,
     onEdit: (path, value) => {
         if (TwineHacker.data[path].value !== value) {
             TwineHacker.stylize(path, false);
