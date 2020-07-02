@@ -41,26 +41,19 @@ const TwineHacker = {
             if (typeof chrome === "undefined") {
                 // noinspection JSUnresolvedVariable,ES6ModulesDependencies
                 browser.storage.sync.set(storageOptions)
-                    .then(value => {
-                    })
-                    .catch(reason => {
-                    });
+                    .catch(reason => TwineHacker.Util.showError(`Cannot save options`, reason));
             } else
                 chrome.storage.sync.set(storageOptions, () => {
                 });
         },
         load: onOptions => {
-            const storageOptions = {
-                automatic: TwineHacker.Options.automatic,
-                interval: TwineHacker.Options.interval,
-            };
             if (typeof chrome === "undefined") {
-                // noinspection JSUnresolvedVariable,ES6ModulesDependencies
+                // noinspection JSUnresolvedVariable,ES6ModulesDependencies,JSUnresolvedFunction
                 browser.storage.sync.get()
-                    .then(value => onOptions(value))
-                    .catch(reason => TwineHacker.Util.showError(reason));
+                    .then(options => onOptions(options))
+                    .catch(reason => TwineHacker.Util.showError(`Cannot load options`, reason));
             } else
-                chrome.storage.sync.get(value => onOptions(value));
+                chrome.storage.sync.get(options => onOptions(options));
         }
     },
     rootExpression: null,
@@ -76,6 +69,7 @@ const TwineHacker = {
     },
     init: window => {
         TwineHacker.DOM.construct(window);
+        // noinspection MagicNumberJS
         TwineHacker.Options.construct(true, 500);
         TwineHacker.DOM.clearElement("content");
         TwineHacker.Util.forEach(TwineHacker.engines, (key, expression) =>
@@ -124,7 +118,14 @@ const TwineHacker = {
     },
     updateFieldValue: (path, newValue) => {
         const item = TwineHacker.data[path];
-        if (item.value !== newValue) {
+        const typeBoolean = item.type === "boolean";
+        const valueChanged = item.value !== newValue;
+        if (typeBoolean && valueChanged) {
+            item.value = newValue;
+            item.editor.checked = newValue;
+            TwineHacker.updateFieldStyle(path, true);
+        }
+        if (!typeBoolean && valueChanged) {
             item.value = newValue;
             item.editor.value = newValue;
             TwineHacker.updateFieldStyle(path, true);
@@ -133,7 +134,8 @@ const TwineHacker = {
     scheduleUpdate: () =>
         setTimeout(TwineHacker.updateAllFields, TwineHacker.Options.interval),
     createUi: (object, path, parent) => {
-        if (typeof object === "object") {
+        const type = typeof object;
+        if (type === "object") {
             parent.setAttribute("class", `${parent.getAttribute("class")} multiple`);
             const table = TwineHacker.DOM.createElement("table", {"class": "object"}, parent);
             TwineHacker.Util.forEach(object, (objectName, objectValue) => {
@@ -148,26 +150,35 @@ const TwineHacker = {
             return table;
         } else {
             parent.setAttribute("class", `${parent.getAttribute("class")} single`);
+            const typeBoolean = type === "boolean";
+            const tooltip = path.substring(1).split('.')
+                .map(x =>
+                    x.charAt(0).toUpperCase()
+                    + x.substring(1).split(/(?=[A-Z])/).join(" ").split("_").join(" "))
+                .join(": ");
+            const tooltipSuffix = typeBoolean ? "?" : ":";
             const span = TwineHacker.DOM.createElement("span", {
-                "class": "single-span",
-                "title": path.substring(1).split('.')
-                    .map(x =>
-                        x.charAt(0).toUpperCase()
-                        + x.substring(1).split(/(?=[A-Z])/).join(" ").split("_").join(" "))
-                    .join(": ")
+                "class": `single-span single-span-${type}`,
+                "title": tooltip + tooltipSuffix
             }, parent);
             const editor = TwineHacker.DOM.createElement("input", {
-                    "type": typeof object === "number" ? "number" : "text",
-                    "value": object
+                    "type": typeBoolean ? "checkbox" : (type === "number" ? "number" : "text"),
+                    "value": typeBoolean ? "true" : object
                 },
                 span);
             TwineHacker.data[path].editor = editor;
-            editor.addEventListener("change", e => TwineHacker.onEdit(path, e.target.value));
-            editor.addEventListener("focus", () => {
+            editor.addEventListener("change", e =>
+                TwineHacker.onEdit(path, typeBoolean ? e.target.checked : e.target.value));
+            editor.addEventListener("focus", e => {
+                e.target.select();
                 TwineHacker.updateField(path);
                 TwineHacker.updateFieldStyle(path, false);
             });
-            editor.addEventListener("blur", e => TwineHacker.onEdit(path, e.target.value));
+            if (typeBoolean)
+                editor.addEventListener("click", e =>
+                    TwineHacker.onEdit(path, typeBoolean ? e.target.checked : e.target.value));
+            editor.addEventListener("blur", e =>
+                TwineHacker.onEdit(path, typeBoolean ? e.target.checked : e.target.value));
             return span;
         }
     },

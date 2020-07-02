@@ -5,6 +5,9 @@
 #content .label, #content input {
     width: 20ex;
 }
+#content .single-span-boolean input {
+    width: auto;
+}
 
 #content .label {
     text-align: right;

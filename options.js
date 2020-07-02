@@ -27,10 +27,7 @@ const TwineHackerOptions = {
         if (typeof chrome === "undefined") {
             // noinspection JSUnresolvedVariable,ES6ModulesDependencies
             browser.storage.sync.set(TwineHackerOptions.options)
-                .then(value => {
-                })
-                .catch(reason => {
-                });
+                .catch(reason => TwineHackerOptions.Util.showError("Cannot save options", reason));
         } else
             chrome.storage.sync.set(TwineHackerOptions.options, () => {
             });
@@ -38,13 +35,15 @@ const TwineHackerOptions = {
     },
     load: onOptions => {
         if (typeof chrome === "undefined") {
-            // noinspection JSUnresolvedVariable,ES6ModulesDependencies
+            // noinspection JSUnresolvedVariable,ES6ModulesDependencies,JSUnresolvedFunction
             browser.storage.sync.get()
                 .then(value => onOptions(value))
-                .catch(reason => {
-                });
+                .catch(reason => TwineHackerOptions.Util.showError("Cannot save options", reason));
         } else
             chrome.storage.sync.get(value => onOptions(value));
+    },
+    Util: {
+        showError: (message, info) => alert(`Error: ${message} ${info ? JSON.stringify(info) : ''}`)
     }
 };
 window.document.addEventListener('DOMContentLoaded', () => TwineHackerOptions.construct());
