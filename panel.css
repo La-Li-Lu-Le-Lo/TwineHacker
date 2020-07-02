@@ -1,10 +1,35 @@
+body, label {
+    background-color: #000000;
+    color: #cccccc;
+}
+
+#options th {
+    text-align: right;
+    font-weight: normal;
+}
+
+#options input {
+    text-align: left;
+    background-color: #000000;
+    color: #cccccc;
+}
+
 #interval {
     width: 8ex;
+}
+
+#content .error {
+    color: #ff0000;
+}
+
+#content .success {
+    color: #008000;
 }
 
 #content .label, #content input {
     width: 20ex;
 }
+
 #content .single-span-boolean input {
     width: auto;
 }
@@ -15,6 +40,8 @@
 
 #content input {
     text-align: left;
+    background-color: #000000;
+    color: #cccccc;
 }
 
 #content .changed {
@@ -22,7 +49,11 @@
 }
 
 #content table, #content tr {
-    border: thin #000000 solid;
+    border: thin #666666 solid;
+}
+
+#content th {
+    font-weight: normal;
 }
 
 #content td {
@@ -30,5 +61,5 @@
 }
 
 #content table:hover, #content tr:hover {
-    border: thin #0000cc solid;
+    border: thin #ccccff solid;
 }

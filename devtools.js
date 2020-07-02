@@ -38,22 +38,27 @@ const TwineHacker = {
                 automatic: TwineHacker.Options.automatic,
                 interval: TwineHacker.Options.interval,
             };
+            // noinspection JSUnresolvedVariable
             if (typeof chrome === "undefined") {
                 // noinspection JSUnresolvedVariable,ES6ModulesDependencies
                 browser.storage.sync.set(storageOptions)
                     .catch(reason => TwineHacker.Util.showError(`Cannot save options`, reason));
-            } else
+            } else { // noinspection JSUnresolvedVariable
                 chrome.storage.sync.set(storageOptions, () => {
                 });
+            }
         },
         load: onOptions => {
+            // noinspection JSUnresolvedVariable
             if (typeof chrome === "undefined") {
                 // noinspection JSUnresolvedVariable,ES6ModulesDependencies,JSUnresolvedFunction
                 browser.storage.sync.get()
                     .then(options => onOptions(options))
                     .catch(reason => TwineHacker.Util.showError(`Cannot load options`, reason));
-            } else
+            } else {
+                // noinspection JSUnresolvedVariable
                 chrome.storage.sync.get(options => onOptions(options));
+            }
         }
     },
     rootExpression: null,
@@ -72,11 +77,21 @@ const TwineHacker = {
         // noinspection MagicNumberJS
         TwineHacker.Options.construct(true, 500);
         TwineHacker.DOM.clearElement("content");
+        let tries = 0;
+        TwineHacker.Util.forEach(TwineHacker.engines, () => {
+            // count
+            tries++;
+        });
         TwineHacker.Util.forEach(TwineHacker.engines, (key, expression) =>
             TwineHacker.Util.eval(expression, vars => {
                 if (vars && !TwineHacker.rootExpression) {
+                    TwineHacker.messageUi(`Detected ${key}`, TwineHacker.DOM.getElement("content"), "success");
                     TwineHacker.inspected(expression, vars);
                 }
+            }, () => {
+                tries--;
+                if (!tries)
+                    TwineHacker.messageUi("No engines detected", TwineHacker.DOM.getElement("content"), "error");
             }));
     },
     inspected: (expression, vars) => {
@@ -97,7 +112,7 @@ const TwineHacker = {
         return cur;
     },
     updateAllFields: () => {
-        if (TwineHacker.DOM.window)
+        if (TwineHacker.DOM.window && TwineHacker.rootExpression)
             TwineHacker.Util.eval(TwineHacker.rootExpression, vars => {
                 TwineHacker.Util.forEach(TwineHacker.data, path =>
                     TwineHacker.updateFieldValue(path, TwineHacker.getInPath(vars, path.substring(1).split('.'))));
@@ -133,6 +148,10 @@ const TwineHacker = {
     },
     scheduleUpdate: () =>
         setTimeout(TwineHacker.updateAllFields, TwineHacker.Options.interval),
+    messageUi: (message, parent, type) =>
+        TwineHacker.DOM.createText(message, TwineHacker.DOM.createElement("div", {
+            "class": type ? type : "",
+        }, parent)),
     createUi: (object, path, parent) => {
         const type = typeof object;
         if (type === "object") {
@@ -227,14 +246,14 @@ const TwineHacker = {
         construct: window => {
             TwineHacker.DOM.window = window;
         },
-        createElement: (name, attrs, parent) => {
-            const element = TwineHacker.DOM.window.document.createElement(name);
+        createElement: (tag, attrs, parent) => {
+            const element = TwineHacker.DOM.window.document.createElement(tag);
             TwineHacker.Util.forEach(attrs, (key, attrValue) => element.setAttribute(key, attrValue));
             if (parent) parent.appendChild(element);
             return element;
         },
-        createText: (value, parent) => {
-            const element = TwineHacker.DOM.window.document.createTextNode(`${value}`);
+        createText: (text, parent) => {
+            const element = TwineHacker.DOM.window.document.createTextNode(`${text}`);
             if (parent) parent.appendChild(element);
             return element;
         },
@@ -254,6 +273,7 @@ const TwineHacker = {
         },
         showError: (message, info) => alert(`Error: ${message} ${info ? JSON.stringify(info) : ''}`),
         eval: (expression, onSuccess, onError) => {
+            // noinspection JSUnresolvedVariable
             if (typeof chrome === "undefined") {
                 // noinspection JSUnresolvedVariable,ES6ModulesDependencies
                 browser.devtools.inspectedWindow.eval(expression)
@@ -263,27 +283,38 @@ const TwineHacker = {
                     .catch(exception => {
                         if (onError) onError(exception);
                     });
-            } else chrome.devtools.inspectedWindow.eval(expression, (result, exception) => {
-                if (exception) {
-                    if (onError) onError(exception);
-                } else {
-                    if (onSuccess) onSuccess(result);
-                }
-            });
+            } else {
+                // noinspection JSUnresolvedVariable
+                chrome.devtools.inspectedWindow.eval(expression, (result, exception) => {
+                    if (exception) {
+                        if (onError) onError(exception);
+                    } else {
+                        if (onSuccess) onSuccess(result);
+                    }
+                });
+            }
         },
         createPanel: (title, icon, page, onShown, onHidden) => {
+            // noinspection JSUnresolvedVariable
             if (typeof chrome === "undefined") {
                 // noinspection JSUnresolvedVariable,ES6ModulesDependencies
                 browser.devtools.panels.create(title, icon, page)
                     .then(panel => {
+                        // noinspection JSUnresolvedVariable,JSDeprecatedSymbols
                         panel.onShown.addListener(onShown);
+                        // noinspection JSUnresolvedVariable,JSDeprecatedSymbols
                         panel.onHidden.addListener(onHidden);
                     });
-            } else chrome.devtools.panels.create(title, icon, page,
-                panel => {
-                    panel.onShown.addListener(onShown);
-                    panel.onHidden.addListener(onHidden);
-                });
+            } else {
+                // noinspection JSUnresolvedVariable
+                chrome.devtools.panels.create(title, icon, page,
+                    panel => {
+                        // noinspection JSUnresolvedVariable,JSDeprecatedSymbols
+                        panel.onShown.addListener(onShown);
+                        // noinspection JSUnresolvedVariable,JSDeprecatedSymbols
+                        panel.onHidden.addListener(onHidden);
+                    });
+            }
         }
     }
 };
