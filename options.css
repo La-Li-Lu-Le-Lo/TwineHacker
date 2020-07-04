@@ -1,25 +1,24 @@
-body, label {
+.body, .label {
     background-color: #000000;
     color: #cccccc;
 }
 
-#options h1 {
+#options .caption {
     margin-block-start: 0em;
     margin-block-end: 0em;
     margin-inline-start: 0px;
     margin-inline-end: 0px;
 }
 
-#options th {
+#options .cell-label {
     text-align: right;
+    font-weight: normal;
 }
 
-#options input {
+#options .editor {
     text-align: left;
     background-color: #000000;
     color: #cccccc;
-}
-
-#interval {
     width: 8ex;
 }
+

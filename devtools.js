@@ -150,21 +150,22 @@ const TwineHacker = {
         setTimeout(TwineHacker.updateAllFields, TwineHacker.Options.interval),
     messageUi: (message, parent, type) =>
         TwineHacker.DOM.createText(message, TwineHacker.DOM.createElement("div", {
-            "class": type ? type : "",
+            "class": `message ${type ? `message-${type}` : ""}`,
         }, parent)),
     createUi: (object, path, parent) => {
         const type = typeof object;
         if (type === "object") {
             parent.setAttribute("class", `${parent.getAttribute("class")} multiple`);
-            const table = TwineHacker.DOM.createElement("table", {"class": "object"}, parent);
+            const table = TwineHacker.DOM.createElement("table", {"class": "grid object"}, parent);
             TwineHacker.Util.forEach(object, (objectName, objectValue) => {
                 const tr = TwineHacker.DOM.createElement("tr", {"class": "row"}, table);
                 TwineHacker.DOM.createText(objectName.split("_")
                         .map(x => x.charAt(0).toUpperCase() + x.substring(1).split(/(?=[A-Z])/).join(" "))
                         .join(" "),
-                    TwineHacker.DOM.createElement("th", {"class": "label"}, tr));
+                    TwineHacker.DOM.createElement("label", {"class": "label"},
+                        TwineHacker.DOM.createElement("th", {"class": "cell cell-label"}, tr)));
                 TwineHacker.createUi(objectValue, `${path}.${objectName}`,
-                    TwineHacker.DOM.createElement("td", {"class": "cell"}, tr));
+                    TwineHacker.DOM.createElement("td", {"class": "cell cell-data"}, tr));
             });
             return table;
         } else {
@@ -176,15 +177,13 @@ const TwineHacker = {
                     + x.substring(1).split(/(?=[A-Z])/).join(" ").split("_").join(" "))
                 .join(": ");
             const tooltipSuffix = typeBoolean ? "?" : ":";
-            const span = TwineHacker.DOM.createElement("span", {
-                "class": `single-span single-span-${type}`,
-                "title": tooltip + tooltipSuffix
-            }, parent);
             const editor = TwineHacker.DOM.createElement("input", {
                     "type": typeBoolean ? "checkbox" : (type === "number" ? "number" : "text"),
-                    "value": typeBoolean ? "true" : object
+                    "value": typeBoolean ? "true" : object,
+                    "class": `editor editor-${type}`,
+                    "title": tooltip + tooltipSuffix
                 },
-                span);
+                parent);
             TwineHacker.data[path].editor = editor;
             editor.addEventListener("change", e =>
                 TwineHacker.onEdit(path, typeBoolean ? e.target.checked : e.target.value));
@@ -198,7 +197,7 @@ const TwineHacker = {
                     TwineHacker.onEdit(path, typeBoolean ? e.target.checked : e.target.value));
             editor.addEventListener("blur", e =>
                 TwineHacker.onEdit(path, typeBoolean ? e.target.checked : e.target.value));
-            return span;
+            return editor;
         }
     },
     createData: (object, path, data) => {

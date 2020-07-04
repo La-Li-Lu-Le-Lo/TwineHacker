@@ -1,44 +1,33 @@
-body, label {
-    background-color: #000000;
-    color: #cccccc;
+#content .message {
+    width: 100%;
+    text-align: center;
 }
 
-#options th {
-    text-align: right;
-    font-weight: normal;
-}
-
-#options input {
-    text-align: left;
-    background-color: #000000;
-    color: #cccccc;
-}
-
-#interval {
-    width: 8ex;
-}
-
-#content .error {
+#content .message.message-error {
     color: #ff0000;
 }
 
-#content .success {
+#content .message.message-success {
     color: #008000;
 }
 
-#content .label, #content input {
+#content .label, #content .cell-label, #content .cell-data.single, #content .editor {
+    width: 35ex;
+}
+
+#content .editor.editor {
     width: 20ex;
 }
 
-#content .single-span-boolean input {
+#content .editor.editor-boolean {
     width: auto;
 }
 
-#content .label {
+#content .cell-label {
     text-align: right;
 }
 
-#content input {
+#content .editor {
     text-align: left;
     background-color: #000000;
     color: #cccccc;
@@ -48,18 +37,18 @@ body, label {
     border-color: #ffff00;
 }
 
-#content table, #content tr {
+#content .grid, #content .row {
     border: thin #666666 solid;
 }
 
-#content th {
+#content .cell-label {
     font-weight: normal;
 }
 
-#content td {
+#content .cell-data {
     border: thin transparent solid;
 }
 
-#content table:hover, #content tr:hover {
+#content .grid:hover, #content .row:hover {
     border: thin #ccccff solid;
 }

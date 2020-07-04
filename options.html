@@ -9,14 +9,14 @@
     <link rel="stylesheet" href="options.css"/>
     <script src="options.js"></script>
 </head>
-<body>
-<table id="options">
-    <tr>
-        <th><h1>TwineHacker options:</h1></th>
-        <th><label for="automatic">Automatic renewal?</label></th>
-        <td><input type="checkbox" id="automatic"/></td>
-        <th><label for="interval">Automatic renewal period:</label></th>
-        <td><input type="number" id="interval" />ms</td>
+<body class="body">
+<table id="options" class="grid">
+    <tr class="row">
+        <th class="cell cell-label"><h1 class="caption">TwineHacker options:</h1></th>
+        <th class="cell cell-label"><label for="automatic" class="label">Automatic renewal?</label></th>
+        <td class="cell cell-data"><input type="checkbox" id="automatic" class="editor"/></td>
+        <th class="cell cell-label"><label for="interval" class="label">Automatic renewal period:</label></th>
+        <td class="cell cell-data"><input type="number" id="interval" class="editor" />ms</td>
     </tr>
 </table>
 </body>
