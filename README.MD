@@ -23,13 +23,25 @@ Extension is completely rewritten, these are changes:
 
 ## TODO
 - support more games and game engines
+- find out cheap(!) new variables detection
+- fix extension death on a large amount of variables 
 
 ## Latest changes
 - 01.07.2012 14:00 - hanging issues fixed (less computations, less cycles)
 - 01.07.2012 23:00 - separate options page (in case if it still hangs) (so storage permissions are required)
 - 02.07.2012 18:00 - black style, detection message
+- 07.07.2012 00:00 - small fixes & changes, reorganized code
 
 ### List of tested games
 - Inheritance
 - Free Cities
 - An Unexpected New Life
+- The Ooze Wizard Apprentice
+- Event Girl
+- Favourite Teacher
+- Girl Crush
+- Paths
+- Repurposing Center
+- Degrees of Lewdity
+- The Company
+- Desideratum Blood Bonds

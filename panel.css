@@ -1,6 +1,4 @@
 #content .message {
-    width: 100%;
-    text-align: center;
 }
 
 #content .message.message-error {
@@ -13,6 +11,9 @@
 
 #content .label, #content .cell-label, #content .cell-data.single, #content .editor {
     width: 35ex;
+}
+#content .object-empty {
+    color: #808080;
 }
 
 #content .editor.editor {

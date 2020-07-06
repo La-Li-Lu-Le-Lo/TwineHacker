@@ -1,4 +1,4 @@
-'use strict';
+"use strict";
 // noinspection SpellCheckingInspection
 const TwineHacker = {
     engines: {
@@ -82,17 +82,21 @@ const TwineHacker = {
             // count
             tries++;
         });
-        TwineHacker.Util.forEach(TwineHacker.engines, (key, expression) =>
-            TwineHacker.Util.eval(expression, vars => {
-                if (vars && !TwineHacker.rootExpression) {
-                    TwineHacker.messageUi(`Detected ${key}`, TwineHacker.DOM.getElement("content"), "success");
-                    TwineHacker.inspected(expression, vars);
-                }
-            }, () => {
-                tries--;
-                if (!tries)
-                    TwineHacker.messageUi("No engines detected", TwineHacker.DOM.getElement("content"), "error");
-            }));
+        TwineHacker.Util.eval("document.title", title => {
+            TwineHacker.DOM.createText(title, "title");
+            return TwineHacker.Util.forEach(TwineHacker.engines, (key, expression) =>
+                TwineHacker.Util.eval(expression, vars => {
+                    if (vars && !TwineHacker.rootExpression) {
+                        TwineHacker.messageUi(`Detected ${key}`, "content", "success");
+                        TwineHacker.inspected(expression, vars);
+                    }
+                }, () => {
+                    tries--;
+                    if (!tries)
+                        TwineHacker.messageUi(`No engines detected`, "content", "error");
+                }));
+        }, ex => TwineHacker.Util.showError(`Cannot access document: ${ex.description}`, ex));
+
     },
     inspected: (expression, vars) => {
         TwineHacker.rootExpression = expression;
@@ -115,7 +119,7 @@ const TwineHacker = {
         if (TwineHacker.DOM.window && TwineHacker.rootExpression)
             TwineHacker.Util.eval(TwineHacker.rootExpression, vars => {
                 TwineHacker.Util.forEach(TwineHacker.data, path =>
-                    TwineHacker.updateFieldValue(path, TwineHacker.getInPath(vars, path.substring(1).split('.'))));
+                    TwineHacker.updateFieldValue(path, TwineHacker.getInPath(vars, path.substring(1).split("."))));
                 if (TwineHacker.Options.automatic)
                     TwineHacker.scheduleUpdate();
             }, ex =>
@@ -124,7 +128,7 @@ const TwineHacker = {
     },
     updateField: path => {
         let expression = `${TwineHacker.rootExpression}`;
-        const array = path.substring(1).split('.');
+        const array = path.substring(1).split(".");
         for (const item of array) {
             expression += `['${item}']`;
         }
@@ -154,50 +158,57 @@ const TwineHacker = {
         }, parent)),
     createUi: (object, path, parent) => {
         const type = typeof object;
-        if (type === "object") {
-            parent.setAttribute("class", `${parent.getAttribute("class")} multiple`);
-            const table = TwineHacker.DOM.createElement("table", {"class": "grid object"}, parent);
-            TwineHacker.Util.forEach(object, (objectName, objectValue) => {
-                const tr = TwineHacker.DOM.createElement("tr", {"class": "row"}, table);
-                TwineHacker.DOM.createText(objectName.split("_")
-                        .map(x => x.charAt(0).toUpperCase() + x.substring(1).split(/(?=[A-Z])/).join(" "))
-                        .join(" "),
-                    TwineHacker.DOM.createElement("label", {"class": "label"},
-                        TwineHacker.DOM.createElement("th", {"class": "cell cell-label"}, tr)));
-                TwineHacker.createUi(objectValue, `${path}.${objectName}`,
-                    TwineHacker.DOM.createElement("td", {"class": "cell cell-data"}, tr));
-            });
-            return table;
-        } else {
-            parent.setAttribute("class", `${parent.getAttribute("class")} single`);
-            const typeBoolean = type === "boolean";
-            const tooltip = path.substring(1).split('.')
-                .map(x =>
-                    x.charAt(0).toUpperCase()
-                    + x.substring(1).split(/(?=[A-Z])/).join(" ").split("_").join(" "))
-                .join(": ");
-            const tooltipSuffix = typeBoolean ? "?" : ":";
-            const editor = TwineHacker.DOM.createElement("input", {
-                    "type": typeBoolean ? "checkbox" : (type === "number" ? "number" : "text"),
-                    "value": typeBoolean ? "true" : object,
-                    "class": `editor editor-${type}`,
-                    "title": tooltip + tooltipSuffix
-                },
-                parent);
-            TwineHacker.data[path].editor = editor;
-            editor.addEventListener("change", e =>
-                TwineHacker.onEdit(path, typeBoolean ? e.target.checked : e.target.value));
-            editor.addEventListener("focus", e => {
-                e.target.select();
-                TwineHacker.updateField(path);
-                TwineHacker.updateFieldStyle(path, false);
-            });
-            if (typeBoolean)
-                editor.addEventListener("click", e =>
+        switch (type) {
+            case "object":
+                TwineHacker.DOM.addClass(parent, "multiple");
+                const table = TwineHacker.DOM.createElement("table", {"class": "grid object"}, parent);
+                TwineHacker.Util.forEach(object, (objectName, objectValue) => {
+                    const tr = TwineHacker.DOM.createElement("tr", {"class": "row"}, table);
+                    TwineHacker.DOM.createText(objectName.split("_")
+                            .map(x => x.charAt(0).toUpperCase() + x.substring(1).split(/(?=[A-Z])/).join(" "))
+                            .join(" "),
+                        TwineHacker.DOM.createElement("label", {"class": "label"},
+                            TwineHacker.DOM.createElement("th", {"class": "cell cell-label"}, tr)));
+                    TwineHacker.createUi(objectValue, `${path}.${objectName}`,
+                        TwineHacker.DOM.createElement("td", {"class": "cell cell-data"}, tr));
+                });
+                return table;
+            case "bigint":
+            case "boolean":
+            case "number":
+            case "string":
+                TwineHacker.DOM.addClass(parent, "single");
+                const typeBoolean = type === "boolean";
+                const tooltipSuffix = typeBoolean ? "?" : ":";
+                const tooltip = path.substring(1).split(".")
+                    .map(x =>
+                        x.charAt(0).toUpperCase()
+                        + x.substring(1).split(/(?=[A-Z])/).join(" ").split("_").join(" "))
+                    .join(": ") + tooltipSuffix;
+                const editor = TwineHacker.DOM.createElement("input", {
+                        "type": typeBoolean ? "checkbox" : (type === "number" ? "number" : "text"),
+                        "value": typeBoolean ? "true" : object,
+                        "class": `editor editor-${type}`,
+                        "title": tooltip
+                    },
+                    parent);
+                TwineHacker.data[path].editor = editor;
+                editor.addEventListener("change", e =>
                     TwineHacker.onEdit(path, typeBoolean ? e.target.checked : e.target.value));
-            editor.addEventListener("blur", e =>
-                TwineHacker.onEdit(path, typeBoolean ? e.target.checked : e.target.value));
-            return editor;
+                editor.addEventListener("focus", e => {
+                    e.target.select();
+                    TwineHacker.updateField(path);
+                    TwineHacker.updateFieldStyle(path, false);
+                });
+                if (typeBoolean)
+                    editor.addEventListener("click", e =>
+                        TwineHacker.onEdit(path, typeBoolean ? e.target.checked : e.target.value));
+                editor.addEventListener("blur", e =>
+                    TwineHacker.onEdit(path, typeBoolean ? e.target.checked : e.target.value));
+                return editor;
+            default:
+                return TwineHacker.DOM.createText(`(${type})`,
+                    TwineHacker.DOM.createElement("span", {"class": "object-empty"}, parent));
         }
     },
     createData: (object, path, data) => {
@@ -213,7 +224,7 @@ const TwineHacker = {
         if (data.value === value) return;
         TwineHacker.updateFieldStyle(path, false);
         let expression = `${TwineHacker.rootExpression}`;
-        const array = path.substring(1).split('.');
+        const array = path.substring(1).split(".");
         for (const item of array) {
             expression += `['${item}']`;
         }
@@ -237,8 +248,13 @@ const TwineHacker = {
         }, ex => TwineHacker.Util.showError(`Cannot set value for ${path} as ${expression}: ${ex.description}`, ex));
     },
     updateFieldStyle: (path, changed) => {
-        TwineHacker.data[path].editor.className = changed;
-        return changed ? "changed" : "";
+        const editor = TwineHacker.data[path].editor;
+        if (changed) {
+            TwineHacker.DOM.addClass(editor, "changed");
+        } else {
+            TwineHacker.DOM.removeClass(editor, "changed");
+        }
+        return editor;
     },
     DOM: {
         window: null,
@@ -248,18 +264,35 @@ const TwineHacker = {
         createElement: (tag, attrs, parent) => {
             const element = TwineHacker.DOM.window.document.createElement(tag);
             TwineHacker.Util.forEach(attrs, (key, attrValue) => element.setAttribute(key, attrValue));
-            if (parent) parent.appendChild(element);
+            if (parent) TwineHacker.DOM.getElement(parent).appendChild(element);
             return element;
         },
         createText: (text, parent) => {
             const element = TwineHacker.DOM.window.document.createTextNode(`${text}`);
-            if (parent) parent.appendChild(element);
+            if (parent) TwineHacker.DOM.getElement(parent).appendChild(element);
             return element;
         },
-        getElement: id => TwineHacker.DOM.window.document.getElementById(id),
-        clearElement: id => {
+        getElement: id => typeof id === "string" ? TwineHacker.DOM.window.document.getElementById(id) : id,
+        clearElement: element => {
+            const e = TwineHacker.DOM.getElement(element);
             // noinspection InnerHTMLJS
-            TwineHacker.DOM.getElement(id).innerHTML = "";
+            e.innerHTML = "";
+            return e;
+        },
+        addClass: (element, className) => {
+            const e = TwineHacker.DOM.getElement(element);
+            e.classList.add(className);
+            return e;
+        },
+        removeClass: (element, className) => {
+            const e = TwineHacker.DOM.getElement(element);
+            e.classList.remove(className);
+            return e;
+        },
+        toggleClass: (element, className) => {
+            const e = TwineHacker.DOM.getElement(element);
+            e.classList.toggle(className);
+            return e;
         }
     },
     Util: {
@@ -270,7 +303,7 @@ const TwineHacker = {
                         iterator(key, array[key]);
             return array;
         },
-        showError: (message, info) => alert(`Error: ${message} ${info ? JSON.stringify(info) : ''}`),
+        showError: (message, info) => alert(`Error: ${message} ${info ? JSON.stringify(info) : ""}`),
         eval: (expression, onSuccess, onError) => {
             // noinspection JSUnresolvedVariable
             if (typeof chrome === "undefined") {
@@ -317,7 +350,7 @@ const TwineHacker = {
         }
     }
 };
-window.document.addEventListener('DOMContentLoaded', () => TwineHacker.construct());
+window.document.addEventListener("DOMContentLoaded", () => TwineHacker.construct());
 
 
 
