@@ -192,6 +192,7 @@ const TwineHacker = {
                         "title": tooltip
                     },
                     parent);
+                if (typeBoolean) editor.checked = object;
                 TwineHacker.data[path].editor = editor;
                 editor.addEventListener("change", e =>
                     TwineHacker.onEdit(path, typeBoolean ? e.target.checked : e.target.value));

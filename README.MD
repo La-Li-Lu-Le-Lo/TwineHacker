@@ -31,6 +31,7 @@ Extension is completely rewritten, these are changes:
 - 01.07.2012 23:00 - separate options page (in case if it still hangs) (so storage permissions are required)
 - 02.07.2012 18:00 - black style, detection message
 - 07.07.2012 00:00 - small fixes & changes, reorganized code
+- 08.07.2012 00:00 - bugfix: checkbox initially not checked
 
 ### List of tested games
 - Inheritance
