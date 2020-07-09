@@ -118,8 +118,10 @@ const TwineHacker = {
     updateAllFields: () => {
         if (TwineHacker.DOM.window && TwineHacker.rootExpression)
             TwineHacker.Util.eval(TwineHacker.rootExpression, vars => {
-                TwineHacker.Util.forEach(TwineHacker.data, path =>
-                    TwineHacker.updateFieldValue(path, TwineHacker.getInPath(vars, path.substring(1).split("."))));
+                TwineHacker.Util.forEach(TwineHacker.data, path => {
+                    TwineHacker.updateFieldStyle(path, false);
+                    TwineHacker.updateFieldValue(path, TwineHacker.getInPath(vars, path.substring(1).split(".")))
+                });
                 if (TwineHacker.Options.automatic)
                     TwineHacker.scheduleUpdate();
             }, ex =>
@@ -138,7 +140,8 @@ const TwineHacker = {
     updateFieldValue: (path, newValue) => {
         const item = TwineHacker.data[path];
         const typeBoolean = item.type === "boolean";
-        const valueChanged = item.value !== newValue;
+        // noinspection EqualityComparisonWithCoercionJS
+        const valueChanged = item.value != newValue;
         if (typeBoolean && valueChanged) {
             item.value = newValue;
             item.editor.checked = newValue;

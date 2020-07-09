@@ -32,6 +32,7 @@ Extension is completely rewritten, these are changes:
 - 02.07.2012 18:00 - black style, detection message
 - 07.07.2012 00:00 - small fixes & changes, reorganized code
 - 08.07.2012 00:00 - bugfix: checkbox initially not checked
+- 09.07.2012 20:00 - bugfix: "changed" highlight fix
 
 ### List of tested games
 - Inheritance
