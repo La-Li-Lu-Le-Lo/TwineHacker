@@ -119,7 +119,6 @@ const TwineHacker = {
         if (TwineHacker.DOM.window && TwineHacker.rootExpression)
             TwineHacker.Util.eval(TwineHacker.rootExpression, vars => {
                 TwineHacker.Util.forEach(TwineHacker.data, path => {
-                    TwineHacker.updateFieldStyle(path, false);
                     TwineHacker.updateFieldValue(path, TwineHacker.getInPath(vars, path.substring(1).split(".")))
                 });
                 if (TwineHacker.Options.automatic)
@@ -140,15 +139,16 @@ const TwineHacker = {
     updateFieldValue: (path, newValue) => {
         const item = TwineHacker.data[path];
         const typeBoolean = item.type === "boolean";
+        const editorValue = TwineHacker.Conv.toEditor(item.type, newValue);
         // noinspection EqualityComparisonWithCoercionJS
-        const valueChanged = item.value != newValue;
+        const valueChanged = item.value != editorValue;
         if (typeBoolean && valueChanged) {
-            item.value = newValue;
-            item.editor.checked = newValue;
+            item.value = editorValue;
+            item.editor.checked = TwineHacker.Conv.toBoolean(item.type, newValue);
             TwineHacker.updateFieldStyle(path, true);
         }
         if (!typeBoolean && valueChanged) {
-            item.value = newValue;
+            item.value = editorValue;
             item.editor.value = newValue;
             TwineHacker.updateFieldStyle(path, true);
         }
@@ -225,30 +225,18 @@ const TwineHacker = {
     },
     onEdit: (path, value) => {
         const data = TwineHacker.data[path];
-        if (data.value === value) return;
+        const fromEditorValue = TwineHacker.Conv.fromEditor(data.type, value);
+        if (data.value === fromEditorValue) return;
         TwineHacker.updateFieldStyle(path, false);
         let expression = `${TwineHacker.rootExpression}`;
         const array = path.substring(1).split(".");
         for (const item of array) {
             expression += `['${item}']`;
         }
-        let expressionValue = `'${value}'`;
-        switch (data.type) {
-            case "number":
-                expressionValue = `${parseFloat(value)}`;
-                break;
-            case "string":
-                expressionValue = `'${value.replace("'", "\\'")}'`;
-                break;
-            case "boolean":
-                expressionValue = `${value}`;
-                break;
-            default:
-                break;
-        }
+        const expressionValue = TwineHacker.Conv.toExpression(data.type, value);
         expression += `=${expressionValue};`;
         TwineHacker.Util.eval(expression, () => {
-            data.value = value;
+            data.value = fromEditorValue;
         }, ex => TwineHacker.Util.showError(`Cannot set value for ${path} as ${expression}: ${ex.description}`, ex));
     },
     updateFieldStyle: (path, changed) => {
@@ -259,6 +247,62 @@ const TwineHacker = {
             TwineHacker.DOM.removeClass(editor, "changed");
         }
         return editor;
+    },
+    Conv: {
+        fromEditor: (type, value) => {
+            switch (type) {
+                case "bigint":
+                    return parseInt(value);
+                case "number":
+                    return parseFloat(value);
+                case "boolean":
+                    return value === "true";
+                case "string":
+                default:
+                    return `${value}`;
+            }
+        },
+        toEditor: (type, value) => {
+            switch (type) {
+                case "bigint":
+                    return `${value}`;
+                case "number":
+                    return `${value}`;
+                case "boolean":
+                    return value ? "true" : "false";
+                case "string":
+                default:
+                    return `${value}`;
+            }
+        },
+        toExpression: (type, value) => {
+            switch (type) {
+                case "bigint":
+                    return `${parseInt(value)}`;
+                case "number":
+                    return `${parseFloat(value)}`;
+                case "string":
+                    return `'${value.replace("'", "\\'")}'`;
+                case "boolean":
+                    return value ? "true" : "false";
+                default:
+                    return `'${value}'`;
+            }
+        },
+        toBoolean: (type, value) => {
+            switch (type) {
+                case "bigint":
+                    return value === 0;
+                case "number":
+                    return value === 0;
+                case "boolean":
+                    return !!value;
+                case "string":
+                    return value === "true" || value === "1";
+                default:
+                    return `${value}`;
+            }
+        }
     },
     DOM: {
         window: null,
