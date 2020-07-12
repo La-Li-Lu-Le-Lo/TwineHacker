@@ -33,6 +33,7 @@ Extension is completely rewritten, these are changes:
 - 07.07.2012 00:00 - small fixes & changes, reorganized code
 - 08.07.2012 00:00 - bugfix: checkbox initially not checked
 - 09.07.2012 20:00 - bugfix: "changed" highlight fix
+- 12.07.2012 13:00 - bugfix: "changed" highlight fix regression
 
 ### List of tested games
 - Inheritance
@@ -47,3 +48,28 @@ Extension is completely rewritten, these are changes:
 - Degrees of Lewdity
 - The Company
 - Desideratum Blood Bonds
+- Female agent
+
+<details>
+<summary>Spoiler Screenshots:</summary>
+
+1. download it here: [https://github.com/lure0xaos/TwineHacker](https://github.com/lure0xaos/TwineHacker)
+
+    1.1. click "Code" button, then "Download ZIP", and unzip it
+![Безымянный0](https://user-images.githubusercontent.com/5437073/87243512-35a1c780-c43f-11ea-99ff-9ae73cf8a3ec.png)
+
+2. How to install:
+
+    2.1. Make sure "Developer mode" is on
+    2.2. Click "Load unpacked" and choose directory where you've downloaded it (where manifest.json is among other files)
+![Безымянный png](https://user-images.githubusercontent.com/5437073/87243532-641fa280-c43f-11ea-8988-eacc5515db1f.png)
+    2.3. So you should see it's loaded without errors:
+![Безымянный2](https://user-images.githubusercontent.com/5437073/87243542-7568af00-c43f-11ea-8633-effa6d2b49c4.png)
+
+3. Open your game and press F12 to open Developer Tools sidebar, then switch to TwineHacker tab:
+![Безымянный3](https://user-images.githubusercontent.com/5437073/87243544-7c8fbd00-c43f-11ea-9bd5-764e587e0252.png)
+
+
+Now you can change any ingame value
+
+</details>
