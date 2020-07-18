@@ -3,22 +3,28 @@
     color: #cccccc;
 }
 
-#options .caption {
+#actions .caption {
     margin-block-start: 0;
     margin-block-end: 0;
     margin-inline-start: 0;
     margin-inline-end: 0;
 }
 
-#options .cell-label {
+#actions .cell-label {
     text-align: right;
     font-weight: normal;
 }
 
-#options .editor {
+#actions .editor {
     text-align: left;
     background-color: #000000;
     color: #cccccc;
-    width: 8ex;
+    width: 40ex;
+}
+
+#actions .button {
+    text-align: center;
+    background-color: #000000;
+    color: #cccccc;
 }
 

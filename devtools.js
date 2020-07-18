@@ -32,6 +32,17 @@ const TwineHacker = {
                 elementInterval.value = TwineHacker.Options.interval;
                 if (options.automatic) TwineHacker.scheduleUpdate();
             });
+
+            const elementFilter = TwineHacker.DOM.getElement("filter");
+            elementFilter.addEventListener("keyup", () => TwineHacker.filterSome(elementFilter.value));
+            elementFilter.addEventListener("focus", e => e.target.select());
+            const elementNoFilter = TwineHacker.DOM.getElement("nofilter");
+            elementNoFilter.addEventListener("click", () => {
+                elementFilter.value = "";
+                TwineHacker.filterSome("");
+                elementFilter.focus();
+            });
+
         },
         save: () => {
             const storageOptions = {
@@ -160,19 +171,29 @@ const TwineHacker = {
             "class": `message ${type ? `message-${type}` : ""}`,
         }, parent)),
     createUi: (object, path, parent) => {
+        const id = TwineHacker.getIdFor(path);
         const type = typeof object;
         switch (type) {
             case "object":
                 TwineHacker.DOM.addClass(parent, "multiple");
-                const table = TwineHacker.DOM.createElement("table", {"class": "grid object"}, parent);
+                const table = TwineHacker.DOM.createElement("table", {
+                    "class": "grid object"
+                }, parent);
                 TwineHacker.Util.forEachSorted(object, (objectName, objectValue) => {
-                    const tr = TwineHacker.DOM.createElement("tr", {"class": "row"}, table);
+                    const objectPath = `${path}.${objectName}`;
+                    const tr = TwineHacker.DOM.createElement("tr", {
+                        "id": TwineHacker.getIdFor(objectPath),
+                        "class": "row"
+                    }, table);
                     TwineHacker.DOM.createText(objectName.split("_")
                             .map(x => x.charAt(0).toUpperCase() + x.substring(1).split(/(?=[A-Z])/).join(" "))
                             .join(" "),
-                        TwineHacker.DOM.createElement("label", {"class": "label"},
+                        TwineHacker.DOM.createElement("label", {
+                                "title": objectPath,
+                                "class": "label"
+                            },
                             TwineHacker.DOM.createElement("th", {"class": "cell cell-label"}, tr)));
-                    TwineHacker.createUi(objectValue, `${path}.${objectName}`,
+                    TwineHacker.createUi(objectValue, objectPath,
                         TwineHacker.DOM.createElement("td", {"class": "cell cell-data"}, tr));
                 });
                 return table;
@@ -248,6 +269,17 @@ const TwineHacker = {
         }
         return editor;
     },
+    getIdFor: path => path.replace(".", "-").toLowerCase(),
+    filterSome: pattern =>
+        TwineHacker.Util.forEach(TwineHacker.data, path => {
+            const item = TwineHacker.data[path];
+            const id = TwineHacker.getIdFor(path);
+            const element = TwineHacker.DOM.getElement(id);
+            if (pattern && element && !id.includes(pattern.toLowerCase())) TwineHacker.DOM.addClass(element, "hidden");
+            else {
+                TwineHacker.DOM.removeClass(element, "hidden");
+            }
+        }),
     Conv: {
         fromEditor: (type, value) => {
             switch (type) {

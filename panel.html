@@ -7,6 +7,7 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge"/>
     <title>TwineHacker</title>
     <link rel="stylesheet" href="options.css"/>
+    <link rel="stylesheet" href="actions.css"/>
     <link rel="stylesheet" href="panel.css"/>
 </head>
 <body class="body">
@@ -17,6 +18,13 @@
         <td class="cell cell-data"><input type="checkbox" id="automatic" class="editor"/></td>
         <th class="cell cell-label"><label for="interval" class="label">Automatic renewal period:</label></th>
         <td class="cell cell-data"><input type="number" id="interval" class="editor" />ms</td>
+    </tr>
+</table>
+<table id="actions" class="grid">
+    <tr class="row">
+        <th class="cell cell-label"><label for="filter" class="label">Filter:</label></th>
+        <td class="cell cell-data"><input type="text" id="filter" class="editor" title="show elements containing..." /></td>
+        <td class="cell cell-data"><input type="button" id="nofilter" class="button" value="x" title="reset filter and show all"/></td>
     </tr>
 </table>
 <div id="content">

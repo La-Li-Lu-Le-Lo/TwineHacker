@@ -53,3 +53,7 @@
 #content .grid:hover, #content .row:hover {
     border: thin #ccccff solid;
 }
+
+#content .hidden {
+    display: none;
+}
