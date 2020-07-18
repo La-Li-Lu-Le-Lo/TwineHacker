@@ -165,7 +165,7 @@ const TwineHacker = {
             case "object":
                 TwineHacker.DOM.addClass(parent, "multiple");
                 const table = TwineHacker.DOM.createElement("table", {"class": "grid object"}, parent);
-                TwineHacker.Util.forEach(object, (objectName, objectValue) => {
+                TwineHacker.Util.forEachSorted(object, (objectName, objectValue) => {
                     const tr = TwineHacker.DOM.createElement("tr", {"class": "row"}, table);
                     TwineHacker.DOM.createText(objectName.split("_")
                             .map(x => x.charAt(0).toUpperCase() + x.substring(1).split(/(?=[A-Z])/).join(" "))
@@ -349,6 +349,18 @@ const TwineHacker = {
                 for (const key in array)
                     if (array.hasOwnProperty(key))
                         iterator(key, array[key]);
+            return array;
+        },
+        forEachSorted: (array, iterator) => {
+            if (array) {
+                const keys = [];
+                for (const key in array)
+                    if (array.hasOwnProperty(key))
+                        keys.push(key);
+                keys.sort();
+                for (const key of keys)
+                    iterator(key, array[key]);
+            }
             return array;
         },
         showError: (message, info) => alert(`Error: ${message} ${info ? JSON.stringify(info) : ""}`),
