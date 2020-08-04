@@ -284,17 +284,36 @@ const TwineHacker = {
             const item = TwineHacker.data[path];
             const id = TwineHacker.getIdForPath(path);
             const element = TwineHacker.DOM.getElement(id);
-            if (pattern && element && !id.includes(pattern.toLowerCase())) TwineHacker.DOM.addClass(element, "hidden");
-            else {
+            if (pattern && element && !id.includes(pattern.toLowerCase())) {
+                TwineHacker.DOM.addClass(element, "hidden");
+            } else {
                 TwineHacker.DOM.removeClass(element, "hidden");
             }
         });
         TwineHacker.highlightSome(pattern);
     },
-    highlightSome: pattern =>
+    highlightSome: pattern => {
         TwineHacker.DOM.applyWithClassOrNot("label", pattern,
             el => TwineHacker.DOM.addClass(el, "highlight"),
-            el => TwineHacker.DOM.removeClass(el, "highlight")),
+            el => TwineHacker.DOM.removeClass(el, "highlight"));
+        TwineHacker.findWithValues(pattern);
+    },
+    findWithValues: pattern =>
+        TwineHacker.Util.forEach(TwineHacker.data, path => {
+            const item = TwineHacker.data[path];
+            const id = TwineHacker.getIdForPath(path);
+            const element = TwineHacker.DOM.getElement(id);
+            const value = item.value;
+            if (pattern && element && value) {
+                if (`${value}`.toLowerCase().includes(pattern.toLowerCase())) {
+                    TwineHacker.DOM.addClass(element, "highlight");
+                } else {
+                    TwineHacker.DOM.removeClass(element, "highlight");
+                }
+            } else {
+                TwineHacker.DOM.removeClass(element, "highlight");
+            }
+        }),
     Conv: {
         fromEditor: (type, value) => {
             switch (type) {

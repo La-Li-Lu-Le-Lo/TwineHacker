@@ -61,3 +61,7 @@
 #content label.highlight {
     color: #ffff00;
 }
+
+#content .row.highlight input, #content .row.highlight textarea {
+    color: #ffff00;
+}
