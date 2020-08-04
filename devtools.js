@@ -43,6 +43,16 @@ const TwineHacker = {
                 elementFilter.focus();
             });
 
+            const elementHighlight = TwineHacker.DOM.getElement("highlight");
+            elementHighlight.addEventListener("keyup", () => TwineHacker.highlightSome(elementHighlight.value));
+            elementHighlight.addEventListener("focus", e => e.target.select());
+            const elementNoHighlight = TwineHacker.DOM.getElement("nohighlight");
+            elementNoHighlight.addEventListener("click", () => {
+                elementHighlight.value = "";
+                TwineHacker.highlightSome("");
+                elementHighlight.focus();
+            });
+
         },
         save: () => {
             const storageOptions = {
@@ -279,10 +289,12 @@ const TwineHacker = {
                 TwineHacker.DOM.removeClass(element, "hidden");
             }
         });
+        TwineHacker.highlightSome(pattern);
+    },
+    highlightSome: pattern =>
         TwineHacker.DOM.applyWithClassOrNot("label", pattern,
             el => TwineHacker.DOM.addClass(el, "highlight"),
-            el => TwineHacker.DOM.removeClass(el, "highlight"));
-    },
+            el => TwineHacker.DOM.removeClass(el, "highlight")),
     Conv: {
         fromEditor: (type, value) => {
             switch (type) {
