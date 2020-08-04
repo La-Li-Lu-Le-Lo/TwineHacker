@@ -149,18 +149,15 @@ const TwineHacker = {
     },
     updateFieldValue: (path, newValue) => {
         const item = TwineHacker.data[path];
-        const typeBoolean = item.type === "boolean";
         const editorValue = TwineHacker.Conv.toEditor(item.type, newValue);
         // noinspection EqualityComparisonWithCoercionJS
-        const valueChanged = item.value != editorValue;
-        if (typeBoolean && valueChanged) {
-            item.value = editorValue;
+        if (item.value != editorValue) {
+            if (item.type === "boolean") {
             item.editor.checked = TwineHacker.Conv.toBoolean(item.type, newValue);
-            TwineHacker.updateFieldStyle(path, true);
-        }
-        if (!typeBoolean && valueChanged) {
-            item.value = editorValue;
+            } else {
             item.editor.value = newValue;
+            }
+            item.value = editorValue;
             TwineHacker.updateFieldStyle(path, true);
         }
     },
@@ -171,7 +168,7 @@ const TwineHacker = {
             "class": `message ${type ? `message-${type}` : ""}`,
         }, parent)),
     createUi: (object, path, parent) => {
-        const id = TwineHacker.getIdFor(path);
+        const id = TwineHacker.getIdForPath(path);
         const type = typeof object;
         switch (type) {
             case "object":
@@ -181,8 +178,9 @@ const TwineHacker = {
                 }, parent);
                 TwineHacker.Util.forEachSorted(object, (objectName, objectValue) => {
                     const objectPath = `${path}.${objectName}`;
+                    const objectId = TwineHacker.getIdForPath(objectPath);
                     const tr = TwineHacker.DOM.createElement("tr", {
-                        "id": TwineHacker.getIdFor(objectPath),
+                        "id": objectId,
                         "class": "row"
                     }, table);
                     TwineHacker.DOM.createText(objectName.split("_")
@@ -190,7 +188,7 @@ const TwineHacker = {
                             .join(" "),
                         TwineHacker.DOM.createElement("label", {
                                 "title": objectPath,
-                                "class": "label"
+                                "class": /*"label"*/`label ${objectName}`
                             },
                             TwineHacker.DOM.createElement("th", {"class": "cell cell-label"}, tr)));
                     TwineHacker.createUi(objectValue, objectPath,
@@ -269,17 +267,22 @@ const TwineHacker = {
         }
         return editor;
     },
-    getIdFor: path => path.replace(".", "-").toLowerCase(),
-    filterSome: pattern =>
+    getIdFor: path => `${path.replace(".", "-").toLowerCase()}`,
+    getIdForPath: path => `path-${path.replace(".", "-").toLowerCase()}`,
+    filterSome: pattern => {
         TwineHacker.Util.forEach(TwineHacker.data, path => {
             const item = TwineHacker.data[path];
-            const id = TwineHacker.getIdFor(path);
+            const id = TwineHacker.getIdForPath(path);
             const element = TwineHacker.DOM.getElement(id);
             if (pattern && element && !id.includes(pattern.toLowerCase())) TwineHacker.DOM.addClass(element, "hidden");
             else {
                 TwineHacker.DOM.removeClass(element, "hidden");
             }
-        }),
+        });
+        TwineHacker.DOM.applyWithClassOrNot("label", pattern,
+            el => TwineHacker.DOM.addClass(el, "highlight"),
+            el => TwineHacker.DOM.removeClass(el, "highlight"));
+    },
     Conv: {
         fromEditor: (type, value) => {
             switch (type) {
@@ -373,6 +376,27 @@ const TwineHacker = {
             const e = TwineHacker.DOM.getElement(element);
             e.classList.toggle(className);
             return e;
+        },
+        applyWithClassOrNot: (element, className, posF, negF) => {
+            const els = TwineHacker.DOM.window.document.getElementsByTagName(element);
+            for (let i = 0; i < els.length; i++) {
+                const el = els.item(i);
+                let found = false;
+                if(className) {
+                    for (const classListElement of el.classList) {
+                        found = classListElement.includes(className);
+                        if (found) {
+                            break;
+                        }
+                    }
+                }
+                if (found) {
+                    posF(el);
+                } else {
+                    negF(el);
+                }
+            }
+            return els;
         }
     },
     Util: {

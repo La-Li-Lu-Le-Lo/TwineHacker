@@ -36,6 +36,7 @@ Extension is completely rewritten, these are changes:
 - 12.07.2012 13:00 - bugfix: "changed" highlight fix regression
 - 18.07.2012 14:00 - alphabetical sorting
 - 18.07.2012 23:00 - filter feature
+- 04.08.2012 22:00 - *filter highlighting feature*
 
 ### List of tested games
 - Inheritance
