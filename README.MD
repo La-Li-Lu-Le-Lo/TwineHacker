@@ -23,8 +23,16 @@ Extension is completely rewritten, these are changes:
 
 ## TODO
 - support more games and game engines
-- find out cheap(!) new variables detection
-- fix extension death on a large amount of variables 
+  - (if i figure it out though)
+- improve speed and stability
+  - find out cheap(!) new variables detection
+  - fix extension death on a large amount of variables
+- variable freeze feature
+  - (anyone does need it? those games are not action games)
+- section collapse
+  - (yeah minimize scrolling would be great, just think where there controls could be place in just plain &lt;table&gt;)
+- support other browsers than Chrome and Firefox
+  - (but aren't they all Chromium-based?)
 
 ## Latest changes
 - 01.07.2012 14:00 - hanging issues fixed (less computations, less cycles)
@@ -39,6 +47,7 @@ Extension is completely rewritten, these are changes:
 - 04.08.2012 22:00 - *filter highlighting feature*
 - 04.08.2012 23:00 - *separate field for highlighting feature*
 - 04.08.2012 23:00 - *highlighting also found values (still not ideal)*
+- 08.08.2012 22:00 - minor fix title issue
 
 ### List of tested games
 - Inheritance
@@ -54,6 +63,8 @@ Extension is completely rewritten, these are changes:
 - The Company
 - Desideratum Blood Bonds
 - Female agent
+- College Daze
+- - (etc not mentioned here)
 
 <details>
 <summary>Spoiler Screenshots:</summary>

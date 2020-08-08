@@ -104,7 +104,7 @@ const TwineHacker = {
             tries++;
         });
         TwineHacker.Util.eval("document.title", title => {
-            TwineHacker.DOM.createText(title, "title");
+            TwineHacker.DOM.setText(title, "title");
             return TwineHacker.Util.forEach(TwineHacker.engines, (key, expression) =>
                 TwineHacker.Util.eval(expression, vars => {
                     if (vars && !TwineHacker.rootExpression) {
@@ -384,6 +384,11 @@ const TwineHacker = {
         createText: (text, parent) => {
             const element = TwineHacker.DOM.window.document.createTextNode(`${text}`);
             if (parent) TwineHacker.DOM.getElement(parent).appendChild(element);
+            return element;
+        },
+        setText: (text, id) => {
+            const element = TwineHacker.DOM.getElement(id);
+            element.innerText = text;
             return element;
         },
         getElement: id => typeof id === "string" ? TwineHacker.DOM.window.document.getElementById(id) : id,
