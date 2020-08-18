@@ -36,7 +36,7 @@ const TwineHacker = {
             const elementFilter = TwineHacker.DOM.getElement("filter");
             elementFilter.addEventListener("keyup", () => TwineHacker.filterSome(elementFilter.value));
             elementFilter.addEventListener("focus", e => e.target.select());
-            const elementNoFilter = TwineHacker.DOM.getElement("nofilter");
+            const elementNoFilter = TwineHacker.DOM.getElement("no-filter");
             elementNoFilter.addEventListener("click", () => {
                 elementFilter.value = "";
                 TwineHacker.filterSome("");
@@ -46,7 +46,7 @@ const TwineHacker = {
             const elementHighlight = TwineHacker.DOM.getElement("highlight");
             elementHighlight.addEventListener("keyup", () => TwineHacker.highlightSome(elementHighlight.value));
             elementHighlight.addEventListener("focus", e => e.target.select());
-            const elementNoHighlight = TwineHacker.DOM.getElement("nohighlight");
+            const elementNoHighlight = TwineHacker.DOM.getElement("no-highlight");
             elementNoHighlight.addEventListener("click", () => {
                 elementHighlight.value = "";
                 TwineHacker.highlightSome("");
@@ -139,9 +139,8 @@ const TwineHacker = {
     updateAllFields: () => {
         if (TwineHacker.DOM.window && TwineHacker.rootExpression)
             TwineHacker.Util.eval(TwineHacker.rootExpression, vars => {
-                TwineHacker.Util.forEach(TwineHacker.data, path => {
-                    TwineHacker.updateFieldValue(path, TwineHacker.getInPath(vars, path.substring(1).split(".")))
-                });
+                TwineHacker.Util.forEach(TwineHacker.data, path =>
+                    TwineHacker.updateFieldValue(path, TwineHacker.getInPath(vars, path.substring(1).split("."))));
                 if (TwineHacker.Options.automatic)
                     TwineHacker.scheduleUpdate();
             }, ex =>
@@ -178,29 +177,33 @@ const TwineHacker = {
             "class": `message ${type ? `message-${type}` : ""}`,
         }, parent)),
     createUi: (object, path, parent) => {
-        const id = TwineHacker.getIdForPath(path);
         const type = typeof object;
         switch (type) {
             case "object":
                 TwineHacker.DOM.addClass(parent, "multiple");
                 const table = TwineHacker.DOM.createElement("table", {
-                    "class": "grid object"
+                    "id": `object-${TwineHacker.getIdFor(path)}`,
+                    "class": "grid object empty"
                 }, parent);
                 TwineHacker.Util.forEachSorted(object, (objectName, objectValue) => {
+                    TwineHacker.DOM.removeClass(table, "empty");
                     const objectPath = `${path}.${objectName}`;
                     const objectId = TwineHacker.getIdForPath(objectPath);
                     const tr = TwineHacker.DOM.createElement("tr", {
                         "id": objectId,
                         "class": "row"
                     }, table);
+                    const label = TwineHacker.DOM.createElement("label", {
+                            "title": objectPath,
+                            "class": `label ${objectName}`
+                        },
+                        TwineHacker.DOM.createElement("th", {"class": "cell cell-label"}, tr));
+                    label.addEventListener("click", () =>
+                        TwineHacker.DOM.toggleClass(`object-${TwineHacker.getIdFor(objectPath)}`, "collapsed"));
                     TwineHacker.DOM.createText(objectName.split("_")
                             .map(x => x.charAt(0).toUpperCase() + x.substring(1).split(/(?=[A-Z])/).join(" "))
                             .join(" "),
-                        TwineHacker.DOM.createElement("label", {
-                                "title": objectPath,
-                                "class": /*"label"*/`label ${objectName}`
-                            },
-                            TwineHacker.DOM.createElement("th", {"class": "cell cell-label"}, tr)));
+                        label);
                     TwineHacker.createUi(objectValue, objectPath,
                         TwineHacker.DOM.createElement("td", {"class": "cell cell-data"}, tr));
                 });
@@ -281,7 +284,6 @@ const TwineHacker = {
     getIdForPath: path => `path-${path.replace(".", "-").toLowerCase()}`,
     filterSome: pattern => {
         TwineHacker.Util.forEach(TwineHacker.data, path => {
-            const item = TwineHacker.data[path];
             const id = TwineHacker.getIdForPath(path);
             const element = TwineHacker.DOM.getElement(id);
             if (pattern && element && !id.includes(pattern.toLowerCase())) {

@@ -29,8 +29,9 @@ Extension is completely rewritten, these are changes:
   - fix extension death on a large amount of variables
 - variable freeze feature
   - (anyone does need it? those games are not action games)
-- section collapse
+- section collapse _improve_
   - (yeah minimize scrolling would be great, just think where there controls could be place in just plain &lt;table&gt;)
+  - we do have it now, great. or very bad.
 - support other browsers than Chrome and Firefox
   - (but aren't they all Chromium-based?)
 
@@ -44,10 +45,11 @@ Extension is completely rewritten, these are changes:
 - 12.07.2012 13:00 - bugfix: "changed" highlight fix regression
 - 18.07.2012 14:00 - alphabetical sorting
 - 18.07.2012 23:00 - filter feature
-- 04.08.2012 22:00 - *filter highlighting feature*
-- 04.08.2012 23:00 - *separate field for highlighting feature*
-- 04.08.2012 23:00 - *highlighting also found values (still not ideal)*
+- 04.08.2012 22:00 - filter highlighting feature
+- 04.08.2012 23:00 - separate field for highlighting feature
+- 04.08.2012 23:00 - highlighting also found values (still not ideal)
 - 08.08.2012 22:00 - minor fix title issue
+- 18.08.2012 21:00 - *experimental section collapsing by label click* - still looks ugly
 
 ### List of tested games
 - Inheritance

@@ -9,9 +9,14 @@
     color: #008000;
 }
 
-#content .label, #content .cell-label, #content .cell-data.single, #content .editor {
+#content .label, #content .cell-label {
     width: 35ex;
 }
+
+#content .cell-data.single, #content .editor {
+    width: 35ex;
+}
+
 #content .object-empty {
     color: #808080;
 }
@@ -21,7 +26,7 @@
 }
 
 #content .editor.editor-boolean {
-    width: auto;
+    width: 20px;
 }
 
 #content .cell-label {
@@ -44,6 +49,7 @@
 
 #content .cell-label {
     font-weight: normal;
+    vertical-align: top;
 }
 
 #content .cell-data {
@@ -55,6 +61,15 @@
 }
 
 #content .hidden {
+    display: none;
+}
+
+#content .collapsed {
+    border: thin #660000 solid;
+    width: 55ex;
+}
+
+#content .collapsed * {
     display: none;
 }
 
