@@ -139,13 +139,15 @@ const TwineHacker = {
     updateAllFields: () => {
         if (TwineHacker.DOM.window && TwineHacker.rootExpression)
             TwineHacker.Util.eval(TwineHacker.rootExpression, vars => {
-                TwineHacker.Util.forEach(TwineHacker.data, path =>
-                    TwineHacker.updateFieldValue(path, TwineHacker.getInPath(vars, path.substring(1).split("."))));
-                if (TwineHacker.Options.automatic)
-                    TwineHacker.scheduleUpdate();
-            }, ex =>
-                TwineHacker.Util.showError(`Cannot evaluate expr ${TwineHacker.rootExpression}: ${ex.description}`,
-                    ex));
+            TwineHacker.Util.forEach(TwineHacker.data, path =>
+                TwineHacker.updateFieldLock(path));
+            TwineHacker.Util.forEach(TwineHacker.data, path =>
+                TwineHacker.updateFieldValue(path, TwineHacker.getInPath(vars, path.substring(1).split("."))));
+            if (TwineHacker.Options.automatic)
+                TwineHacker.scheduleUpdate();
+        }, ex =>
+            TwineHacker.Util.showError(`Cannot evaluate expr ${TwineHacker.rootExpression}: ${ex.description}`,
+                ex));
     },
     updateField: path => {
         let expression = `${TwineHacker.rootExpression}`;
@@ -156,8 +158,17 @@ const TwineHacker = {
         TwineHacker.Util.eval(expression, newValue => TwineHacker.updateFieldValue(path, newValue),
             ex => TwineHacker.Util.showError(`Cannot evaluate ${expression}: ${ex.description}`, ex));
     },
+    updateFieldLock: (path) => {
+        const item = TwineHacker.data[path];
+        if (item.locked) {
+            TwineHacker.lockValue(path);
+        }
+    },
     updateFieldValue: (path, newValue) => {
         const item = TwineHacker.data[path];
+        if (item.locked) {
+            newValue = item.lockedValue;
+        }
         const editorValue = TwineHacker.Conv.toEditor(item.type, newValue);
         // noinspection EqualityComparisonWithCoercionJS
         if (item.value != editorValue) {
@@ -241,6 +252,17 @@ const TwineHacker = {
                         TwineHacker.onEdit(path, typeBoolean ? e.target.checked : e.target.value));
                 editor.addEventListener("blur", e =>
                     TwineHacker.onEdit(path, typeBoolean ? e.target.checked : e.target.value));
+                const locker = TwineHacker.DOM.createElement("input", {
+                        "type": "checkbox",
+                        "value": "locked",
+                        "class": `editor-lock`,
+                        "title": `Lock ${tooltip}`
+                    },
+                    parent);
+                TwineHacker.data[path].locked = false;
+                TwineHacker.data[path].lockedValue = TwineHacker.data[path].value;
+                locker.addEventListener("click", e =>
+                    TwineHacker.onLock(path, e.target.checked, editor.value));
                 return editor;
             default:
                 return TwineHacker.DOM.createText(`(${type})`,
@@ -257,8 +279,19 @@ const TwineHacker = {
     },
     onEdit: (path, value) => {
         const data = TwineHacker.data[path];
+        if (data.locked)
+            data.lockedValue = value;
+        if (data.value !== TwineHacker.Conv.fromEditor(data.type, value))
+            TwineHacker.setFieldValue(path, value);
+    },
+    lockValue: (path) => {
+        const data = TwineHacker.data[path];
+        if (data.locked)
+            TwineHacker.setFieldValue(path, data.lockedValue);
+    },
+    setFieldValue: (path, value) => {
+        const data = TwineHacker.data[path];
         const fromEditorValue = TwineHacker.Conv.fromEditor(data.type, value);
-        if (data.value === fromEditorValue) return;
         TwineHacker.updateFieldStyle(path, false);
         let expression = `${TwineHacker.rootExpression}`;
         const array = path.substring(1).split(".");
@@ -270,6 +303,11 @@ const TwineHacker = {
         TwineHacker.Util.eval(expression, () => {
             data.value = fromEditorValue;
         }, ex => TwineHacker.Util.showError(`Cannot set value for ${path} as ${expression}: ${ex.description}`, ex));
+    },
+    onLock: (path, lock, value) => {
+        TwineHacker.data[path].locked = true;
+        TwineHacker.data[path].lockedValue = value;
+        TwineHacker.onEdit(path, value);
     },
     updateFieldStyle: (path, changed) => {
         const editor = TwineHacker.data[path].editor;

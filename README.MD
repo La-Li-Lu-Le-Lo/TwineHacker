@@ -49,7 +49,8 @@ Extension is completely rewritten, these are changes:
 - 04.08.2012 23:00 - separate field for highlighting feature
 - 04.08.2012 23:00 - highlighting also found values (still not ideal)
 - 08.08.2012 22:00 - minor fix title issue
-- 18.08.2012 21:00 - *experimental section collapsing by label click* - still looks ugly
+- 18.08.2012 21:00 - section collapsing by label click (still looks ugly)
+- 25.10.2012 16:00 - *experimental value lock* - still may be buggy
 
 ### List of tested games
 - Inheritance
