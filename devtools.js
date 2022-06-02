@@ -103,10 +103,10 @@ const TwineHacker = {
             // count
             tries++;
         });
-        TwineHacker.Util.eval("document.title", title => {
+        TwineHacker.Util.eval("window.document.title", title => {
             TwineHacker.DOM.setText(title, "title");
             return TwineHacker.Util.forEach(TwineHacker.engines, (key, expression) =>
-                TwineHacker.Util.eval(expression, vars => {
+                TwineHacker.Util.eval(`try{${expression}}catch(e){null}`, vars => {
                     if (vars && !TwineHacker.rootExpression) {
                         TwineHacker.messageUi(`Detected ${key}`, "content", "success");
                         TwineHacker.inspected(expression, vars);
@@ -139,15 +139,15 @@ const TwineHacker = {
     updateAllFields: () => {
         if (TwineHacker.DOM.window && TwineHacker.rootExpression)
             TwineHacker.Util.eval(TwineHacker.rootExpression, vars => {
-            TwineHacker.Util.forEach(TwineHacker.data, path =>
-                TwineHacker.updateFieldLock(path));
-            TwineHacker.Util.forEach(TwineHacker.data, path =>
-                TwineHacker.updateFieldValue(path, TwineHacker.getInPath(vars, path.substring(1).split("."))));
-            if (TwineHacker.Options.automatic)
-                TwineHacker.scheduleUpdate();
-        }, ex =>
-            TwineHacker.Util.showError(`Cannot evaluate expr ${TwineHacker.rootExpression}: ${ex.description}`,
-                ex));
+                TwineHacker.Util.forEach(TwineHacker.data, path =>
+                    TwineHacker.updateFieldLock(path));
+                TwineHacker.Util.forEach(TwineHacker.data, path =>
+                    TwineHacker.updateFieldValue(path, TwineHacker.getInPath(vars, path.substring(1).split("."))));
+                if (TwineHacker.Options.automatic)
+                    TwineHacker.scheduleUpdate();
+            }, ex =>
+                TwineHacker.Util.showError(`Cannot evaluate expr ${TwineHacker.rootExpression}: ${ex.description}`,
+                    ex));
     },
     updateField: path => {
         let expression = `${TwineHacker.rootExpression}`;
@@ -173,9 +173,9 @@ const TwineHacker = {
         // noinspection EqualityComparisonWithCoercionJS
         if (item.value != editorValue) {
             if (item.type === "boolean") {
-            item.editor.checked = TwineHacker.Conv.toBoolean(item.type, newValue);
+                item.editor.checked = TwineHacker.Conv.toBoolean(item.type, newValue);
             } else {
-            item.editor.value = newValue;
+                item.editor.value = newValue;
             }
             item.value = editorValue;
             TwineHacker.updateFieldStyle(path, true);
@@ -458,7 +458,7 @@ const TwineHacker = {
             for (let i = 0; i < els.length; i++) {
                 const el = els.item(i);
                 let found = false;
-                if(className) {
+                if (className) {
                     for (const classListElement of el.classList) {
                         found = classListElement.includes(className);
                         if (found) {
@@ -509,7 +509,7 @@ const TwineHacker = {
                     });
             } else {
                 // noinspection JSUnresolvedVariable
-                chrome.devtools.inspectedWindow.eval(expression, (result, exception) => {
+                chrome.devtools.inspectedWindow.eval(expression, {}, (result, exception) => {
                     if (exception) {
                         if (onError) onError(exception);
                     } else {
@@ -543,7 +543,3 @@ const TwineHacker = {
     }
 };
 window.document.addEventListener("DOMContentLoaded", () => TwineHacker.construct());
-
-
-
-

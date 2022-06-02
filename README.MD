@@ -36,21 +36,22 @@ Extension is completely rewritten, these are changes:
   - (but aren't they all Chromium-based?)
 
 ## Latest changes
-- 01.07.2012 14:00 - hanging issues fixed (less computations, less cycles)
-- 01.07.2012 23:00 - separate options page (in case if it still hangs) (so storage permissions are required)
-- 02.07.2012 18:00 - black style, detection message
-- 07.07.2012 00:00 - small fixes & changes, reorganized code
-- 08.07.2012 00:00 - bugfix: checkbox initially not checked
-- 09.07.2012 20:00 - bugfix: "changed" highlight fix
-- 12.07.2012 13:00 - bugfix: "changed" highlight fix regression
-- 18.07.2012 14:00 - alphabetical sorting
-- 18.07.2012 23:00 - filter feature
-- 04.08.2012 22:00 - filter highlighting feature
-- 04.08.2012 23:00 - separate field for highlighting feature
-- 04.08.2012 23:00 - highlighting also found values (still not ideal)
-- 08.08.2012 22:00 - minor fix title issue
-- 18.08.2012 21:00 - section collapsing by label click (still looks ugly)
-- 25.10.2012 16:00 - *experimental value lock* - still may be buggy
+- 01.07.2021 14:00 - hanging issues fixed (less computations, less cycles)
+- 01.07.2021 23:00 - separate options page (in case if it still hangs) (so storage permissions are required)
+- 02.07.2021 18:00 - black style, detection message
+- 07.07.2021 00:00 - small fixes & changes, reorganized code
+- 08.07.2021 00:00 - bugfix: checkbox initially not checked
+- 09.07.2021 20:00 - bugfix: "changed" highlight fix
+- 12.07.2021 13:00 - bugfix: "changed" highlight fix regression
+- 18.07.2021 14:00 - alphabetical sorting
+- 18.07.2021 23:00 - filter feature
+- 04.08.2021 22:00 - filter highlighting feature
+- 04.08.2021 23:00 - separate field for highlighting feature
+- 04.08.2021 23:00 - highlighting also found values (still not ideal)
+- 08.08.2021 22:00 - minor fix title issue
+- 18.08.2021 21:00 - section collapsing by label click (still looks ugly)
+- 25.10.2021 16:00 - experimental value lock
+- 28.07.2022 17:00 - *v3 manifest, error alert fix*
 
 ### List of tested games
 - Inheritance
