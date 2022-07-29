@@ -6,22 +6,22 @@
           content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0"/>
     <meta http-equiv="X-UA-Compatible" content="ie=edge"/>
     <title>TwineHacker</title>
-    <link rel="stylesheet" href="options.css"/>
-    <link rel="stylesheet" href="actions.css"/>
+    <link rel="stylesheet" href="control.css"/>
     <link rel="stylesheet" href="panel.css"/>
 </head>
 <body class="body">
 <h1 class="caption" id="title"></h1>
-<table id="options" class="grid">
-    <tr class="row">
+<table class="grid" id="control">
+    <tr id="options" class="row">
         <th class="cell cell-label"><label for="automatic" class="label">Automatic renewal?</label></th>
         <td class="cell cell-data"><input type="checkbox" id="automatic" class="editor"/></td>
+        <td class="cell cell-data"></td>
+
         <th class="cell cell-label"><label for="interval" class="label">Automatic renewal period:</label></th>
-        <td class="cell cell-data"><input type="number" id="interval" class="editor" />ms</td>
+        <td class="cell cell-data"><input type="number" id="interval" class="editor editor-min" />ms</td>
+        <td class="cell cell-data"></td>
     </tr>
-</table>
-<table id="actions" class="grid">
-    <tr class="row">
+    <tr id="actions" class="row">
         <th class="cell cell-label"><label for="filter" class="label">Filter:</label></th>
         <td class="cell cell-data">
             <input type="text" id="filter" class="editor" title="show elements containing..." />
