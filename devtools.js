@@ -53,6 +53,15 @@ const TwineHacker = {
                 elementHighlight.focus();
             });
 
+            const elementCollapseAll = TwineHacker.DOM.getElement("collapse-all");
+            elementCollapseAll.addEventListener("click", () => {
+                TwineHacker.expandCollapseAll(true)
+            })
+
+            const elementExpandAll = TwineHacker.DOM.getElement("expand-all");
+            elementExpandAll.addEventListener("click", () => {
+                TwineHacker.expandCollapseAll(false)
+            })
         },
         save: () => {
             const storageOptions = {
@@ -198,6 +207,7 @@ const TwineHacker = {
                 }, parent);
                 TwineHacker.Util.forEachSorted(object, (objectName, objectValue) => {
                     TwineHacker.DOM.removeClass(table, "empty");
+                    TwineHacker.DOM.addClass(table, "collapsible");
                     const objectPath = `${path}.${objectName}`;
                     const objectId = TwineHacker.getIdForPath(objectPath);
                     const tr = TwineHacker.DOM.createElement("tr", {
@@ -354,6 +364,20 @@ const TwineHacker = {
                 TwineHacker.DOM.removeClass(element, "highlight");
             }
         }),
+    expandCollapseAll: (collapse) => {
+        TwineHacker.DOM.getElement("content")
+        const elements = TwineHacker.DOM.getElementsByClassName("collapsible");
+        for (let i = 0; i < elements.length; i++) {
+            const element = elements.item(i);
+            if (element.id !== "object-") {
+                if (collapse) {
+                    TwineHacker.DOM.addClass(element, "collapsed");
+                } else {
+                    TwineHacker.DOM.removeClass(element, "collapsed");
+                }
+            }
+        }
+    },
     Conv: {
         fromEditor: (type, value) => {
             switch (type) {
@@ -432,6 +456,7 @@ const TwineHacker = {
             return element;
         },
         getElement: id => typeof id === "string" ? TwineHacker.DOM.window.document.getElementById(id) : id,
+        getElementsByClassName: id => TwineHacker.DOM.window.document.getElementsByClassName(id),
         clearElement: element => {
             const e = TwineHacker.DOM.getElement(element);
             // noinspection InnerHTMLJS

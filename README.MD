@@ -52,6 +52,7 @@ Extension is completely rewritten, these are changes:
 - 18.08.2021 21:00 - section collapsing by label click (still looks ugly)
 - 25.10.2021 16:00 - experimental value lock
 - 28.07.2022 17:00 - *v3 manifest, error alert fix*
+- 29.07.2022 20:00 - collapse all, expand all feature
 
 ### List of tested games
 - Inheritance
@@ -68,6 +69,7 @@ Extension is completely rewritten, these are changes:
 - Desideratum Blood Bonds
 - Female agent
 - College Daze
+- Degrees of Lewdity
 - - (etc not mentioned here)
 
 <details>
