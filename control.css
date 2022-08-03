@@ -35,3 +35,8 @@
 #control .editor.editor-min {
     width: 8ex;
 }
+
+#control .small {
+    font-size: small;
+    color: #666666;
+}
