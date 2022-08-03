@@ -4,8 +4,6 @@
   "description": "Allows you to change font/style; also adds cheats",
   "manifest_version": 3,
   "permissions": [
-    "activeTab",
-    "tabs",
     "storage"
   ],
   "host_permissions": [
